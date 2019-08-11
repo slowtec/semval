@@ -1,0 +1,41 @@
+sudo: required
+
+language: rust
+
+rust:
+  - stable
+
+matrix:
+  fast_finish: true
+
+branches:
+  only:
+    # release tags
+    - /^v\d+\.\d+\.\d+.*$/
+    - master
+
+before_cache:
+  # Travis can't cache files that are not readable by "others"
+  - chmod -R a+r $HOME/.cargo
+
+cache: cargo
+
+# load travis-cargo
+before_script:
+  - |
+      export PATH=$HOME/.local/bin:$PATH
+      cargo install cargo-update || echo "cargo-update already installed" &&
+      cargo install cargo-travis || echo "cargo-travis already installed" &&
+      cargo install-update -a
+
+script:
+  - |
+      cargo build &&
+      cargo test
+
+after_success:
+  - cargo coveralls
+
+notifications:
+  email:
+    on_success: never

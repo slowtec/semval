@@ -1,0 +1,17 @@
+[package]
+name = "semval"
+description = "Semantic validation"
+keywords = ["semantic", "validation"]
+version = "0.0.0"
+license = "Apache-2.0 OR MIT"
+readme = "README.md"
+authors = ["Uwe Klotz <uwe.klotz@gmail.com>"]
+repository = "https://github.com/uklotzde/semval"
+edition = "2018"
+
+[dependencies]
+smallvec = "^0.6"
+
+[features]
+default = ["std"]
+std = []

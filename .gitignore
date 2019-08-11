@@ -1,0 +1,12 @@
+# Cargo artefacts
+Cargo.lock
+
+# Build directory (or a symbolic link to it)
+/target
+
+# Backup files
+**/*~
+**/*.rs.bk
+
+# macOS
+.DS_Store
