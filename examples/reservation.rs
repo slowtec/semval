@@ -13,7 +13,7 @@ impl Email {
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 enum EmailValidation {
     MinLen(usize),
-    Format,
+    InvalidFormat,
 }
 
 impl Validate<EmailValidation> for Email {
@@ -23,7 +23,7 @@ impl Validate<EmailValidation> for Email {
             context.add_violation(EmailValidation::MinLen(Self::min_len()));
         }
         if self.0.chars().filter(|c| *c == '@').count() != 1 {
-            context.add_violation(EmailValidation::Format);
+            context.add_violation(EmailValidation::InvalidFormat);
         }
         context.finish_validation()
     }
@@ -54,36 +54,54 @@ impl Validate<PhoneValidation> for Phone {
 }
 
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
-struct Customer {
-    name: String,
+struct ContactData {
     email: Option<Email>,
     phone: Option<Phone>,
 }
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
-enum CustomerValidation {
-    EmptyName,
+enum ContactDataValidation {
     Phone(PhoneValidation),
     Email(EmailValidation),
-    MissingContactData,
+    Incomplete,
+}
+
+impl Validate<ContactDataValidation> for ContactData {
+    fn validate(&self) -> ValidationResult<ContactDataValidation> {
+        let mut context = Self::start_validation();
+        if let Some(ref email) = self.email {
+            context.map_and_merge_result(email.validate(), ContactDataValidation::Email)
+        }
+        if let Some(ref phone) = self.phone {
+            context.map_and_merge_result(phone.validate(), ContactDataValidation::Phone)
+        }
+        // Either email or phone must be present
+        if self.email.is_none() && self.phone.is_none() {
+            context.add_violation(ContactDataValidation::Incomplete);
+        }
+        context.finish_validation()
+    }
+}
+
+#[derive(Clone, Debug, Default, Eq, PartialEq)]
+struct Customer {
+    name: String,
+    contact_data: ContactData,
+}
+
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+enum CustomerValidation {
+    NameEmpty,
+    ContactData(ContactDataValidation),
 }
 
 impl Validate<CustomerValidation> for Customer {
     fn validate(&self) -> ValidationResult<CustomerValidation> {
         let mut context = Self::start_validation();
         if self.name.is_empty() {
-            context.add_violation(CustomerValidation::EmptyName);
+            context.add_violation(CustomerValidation::NameEmpty);
         }
-        if let Some(ref email) = self.email {
-            context.map_and_merge_result(email.validate(), CustomerValidation::Email)
-        }
-        if let Some(ref phone) = self.phone {
-            context.map_and_merge_result(phone.validate(), CustomerValidation::Phone)
-        }
-        // Either email or phone must be present
-        if self.email.is_none() && self.phone.is_none() {
-            context.add_violation(CustomerValidation::MissingContactData);
-        }
+        context.map_and_merge_result(self.contact_data.validate(), CustomerValidation::ContactData);
         context.finish_validation()
     }
 }
@@ -137,11 +155,11 @@ fn main() {
     let mut reservation = Reservation::default();
     println!("{:?}: {:?}", reservation, reservation.validate());
 
-    reservation.customer.email = Some(Email("a@b@c".to_string()));
+    reservation.customer.contact_data.email = Some(Email("a@b@c".to_string()));
     println!("{:?}: {:?}", reservation, reservation.validate());
 
     reservation.customer.name = "Mr X".to_string();
-    reservation.customer.email = Some(Email("a@b.c".to_string()));
+    reservation.customer.contact_data.email = Some(Email("a@b.c".to_string()));
     reservation.quantity = Quantity(4);
     println!("{:?}: {:?}", reservation, reservation.validate());
 }

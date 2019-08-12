@@ -8,7 +8,7 @@
 [![Apache 2.0 licensed](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](./LICENSE-APACHE)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE-MIT)
 
-Semantic validation for Rust.
+A lightweight, composable framework for semantic validation in Rust.
 
 ***Work in progress - do not use, yet!***
 
