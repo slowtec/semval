@@ -32,17 +32,22 @@ where
     }
 }
 
+impl<T> Default for Context<T>
+where
+    T: Validation,
+{
+    fn default() -> Self {
+         Self {
+            violations: smallvec![],
+        }
+   }
+}
+
 impl<T> Context<T>
 where
     T: Validation,
 {
-    pub(crate) fn new() -> Self {
-        Self {
-            violations: smallvec![],
-        }
-    }
-
-    /// Check if the context has violations.
+    /// Check if the context has violations
     pub fn has_violations(&self) -> bool {
         !self.violations.is_empty()
     }
@@ -86,8 +91,8 @@ where
         }
     }
 
-    /// Finish the current validation by wrapping the context in a result.
-    pub fn finish_validation(self) -> Result<T> {
+    /// Finish the current validation with a result
+    pub fn into_result(self) -> Result<T> {
         if self.violations.is_empty() {
             Ok(())
         } else {
@@ -114,15 +119,15 @@ mod tests {
 
     #[test]
     fn default_context() {
-        let context = Context::<()>::new();
+        let context = Context::<()>::default();
         assert!(!context.has_violations());
         assert_eq!(0, context.count_violations());
-        assert!(context.finish_validation().is_ok());
+        assert!(context.into_result().is_ok());
     }
 
     #[test]
     fn add_error() {
-        let mut context = Context::<()>::new();
+        let mut context = Context::<()>::default();
         assert!(!context.has_violations());
         for _ in 0..=SMALLVEC_ARRAY_LEN + 1 {
             let violations_before = context.count_violations();

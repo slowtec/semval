@@ -34,10 +34,6 @@ where
 {
     /// Perform validation.
     fn validate(&self) -> Result<T>;
-
-    fn start_validation() -> Context<T> {
-        Context::new()
-    }
 }
 
 #[cfg(test)]
@@ -48,7 +44,7 @@ mod tests {
 
     impl Validate<()> for Dummy {
         fn validate(&self) -> Result<()> {
-            Self::start_validation().finish_validation()
+            Context::default().into_result()
         }
     }
 
