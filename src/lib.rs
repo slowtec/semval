@@ -118,4 +118,8 @@ where
 {
     /// Validate this instance.
     fn validate(&self) -> Result<T>;
+
+    fn start_validation() -> Errors<T> {
+        Errors::default()
+    }
 }
