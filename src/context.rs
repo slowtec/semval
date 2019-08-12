@@ -10,7 +10,10 @@ const SMALLVEC_ARRAY_LEN: usize = 8;
 
 type SmallVecArray<T> = [T; SMALLVEC_ARRAY_LEN];
 
-/// A validation context for collecting validation violations.
+/// A collection of violations resulting from a validation
+///
+/// Collects violations that are detected while performing
+/// a validation.
 #[derive(Clone, Debug)]
 pub struct Context<T>
 where
@@ -52,17 +55,17 @@ where
         !self.violations.is_empty()
     }
 
-    /// Count the number of violations in the context.
+    /// Count the number of violations in the context
     pub fn count_violations(&self) -> usize {
         self.violations.len()
     }
 
-    /// Add a new violation to the context.
+    /// Add a new violation to the context
     pub fn add_violation(&mut self, violation: impl Into<T>) {
         self.violations.push(violation.into());
     }
 
-    /// Merge with another context.
+    /// Merge with another context
     pub fn merge_violations(&mut self, other: Self) {
         self.violations.reserve(other.violations.len());
         for error in other.violations.into_iter() {
@@ -70,14 +73,14 @@ where
         }
     }
 
-    /// Merge with a validation result.
+    /// Merge with a validation result
     pub fn merge_result(&mut self, res: Result<T>) {
         if let Err(other) = res {
             self.merge_violations(other);
         }
     }
 
-    /// Merge with an incompatible validation result.
+    /// Merge with an unrelated validation result
     pub fn map_and_merge_result<F, V>(&mut self, res: Result<V>, map: F)
     where
         F: Fn(V) -> T,

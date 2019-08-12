@@ -1,7 +1,21 @@
+#![deny(missing_docs)]
+#![deny(missing_debug_implementations)]
+#![cfg_attr(test, deny(warnings))]
+
 #![cfg_attr(not(feature = "std"), no_std)]
 
+//! # semval
+//!
+//! A lightweight, composable framework for semantic validation in Rust.
+//!
+//! Without any macro magic, at least not now.
+
+/// Validation context
 pub mod context;
 
+/// The crate's prelude
+///
+/// A proposed set of imports to ease usage of this crate.
 pub mod prelude {
     pub use super::{
         context::Context as ValidationContext, Result as ValidationResult, Validate, Validation,
@@ -12,27 +26,30 @@ use context::Context;
 
 use core::{any::Any, fmt::Debug};
 
+/// Result of a validation
 pub type Result<T> = core::result::Result<(), Context<T>>;
 
-/// A `Validation` defines the context for validating certain objectives.
-/// These types are typically an `enum`s with one variant per objective.
-/// Some of these variants may recursively wrap dependent validations to
-/// trace back the root cause of a validation error.
+/// Objectives that might be violated
 ///
-/// For an anonymous or innermost context use the unit type `()`,
-/// e.g. when validating non-composite types without the need for
-/// any distinctive objectives.
+/// A validation fails if one or more objectives are violated.
+///
+/// These types are typically `enum`s with one variant per objective.
+/// Some of the variants may recursively wrap dependent validations
+/// to trace back the root cause.
 pub trait Validation: Any + Debug {}
 
 impl<T> Validation for T where T: Any + Debug {}
 
-/// A trait for validating types. Validation is expected to be an expensive
-/// operation that should only be invoked when crossing boundaries.
+/// A trait for validating types
+///
+/// Validation is expected to be an expensive operation that should
+/// only be invoked when crossing boundaries between independent
+/// components.
 pub trait Validate<T>
 where
     T: Validation,
 {
-    /// Perform validation.
+    /// Perform the validation
     fn validate(&self) -> Result<T>;
 }
 
