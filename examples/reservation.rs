@@ -1,117 +1,147 @@
 use semval::prelude::*;
 
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
-struct Email(pub String);
+struct Email(String);
 
 impl Email {
-    pub const fn min_len() -> usize {
+    const fn min_len() -> usize {
         // a@b.c = 5 chars
         5
     }
 }
 
-impl Validate<()> for Email {
-    fn validate(&self) -> ValidationResult<()> {
-        let mut errors = Self::start_validation();
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+enum EmailValidation {
+    MinLen(usize),
+    Format,
+}
+
+impl Validate<EmailValidation> for Email {
+    fn validate(&self) -> ValidationResult<EmailValidation> {
+        let mut context = Self::start_validation();
         if self.0.len() < Self::min_len() {
-            errors.add_error((), Validity::too_short(Self::min_len()));
+            context.add_violation(EmailValidation::MinLen(Self::min_len()));
         }
         if self.0.chars().filter(|c| *c == '@').count() != 1 {
-            errors.add_error((), Validity::Invalid);
+            context.add_violation(EmailValidation::Format);
         }
-        errors.into_result()
+        context.finish_validation()
     }
 }
 
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
-struct Phone(pub String);
+struct Phone(String);
 
 impl Phone {
-    pub const fn min_len() -> usize {
+    const fn min_len() -> usize {
         6
     }
 }
 
-impl Validate<()> for Phone {
-    fn validate(&self) -> ValidationResult<()> {
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+enum PhoneValidation {
+    MinLen(usize),
+}
+
+impl Validate<PhoneValidation> for Phone {
+    fn validate(&self) -> ValidationResult<PhoneValidation> {
+        let mut context = Self::start_validation();
         if self.0.chars().filter(|c| !c.is_whitespace()).count() < Self::min_len() {
-            ValidationErrors::error((), Validity::too_short(Self::min_len())).into_result()
-        } else {
-            Ok(())
+            context.add_violation(PhoneValidation::MinLen(Self::min_len()));
         }
+        context.finish_validation()
     }
 }
 
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
 struct Customer {
-    pub name: String,
-    pub email: Option<Email>,
-    pub phone: Option<Phone>,
+    name: String,
+    email: Option<Email>,
+    phone: Option<Phone>,
 }
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
-pub enum CustomerValidation {
-    Name,
-    Phone,
-    Email,
-    ContactData,
+enum CustomerValidation {
+    EmptyName,
+    Phone(PhoneValidation),
+    Email(EmailValidation),
+    MissingContactData,
 }
 
 impl Validate<CustomerValidation> for Customer {
     fn validate(&self) -> ValidationResult<CustomerValidation> {
-        let mut errors = Self::start_validation();
+        let mut context = Self::start_validation();
         if self.name.is_empty() {
-            errors.add_error(CustomerValidation::Name, Validity::Empty);
+            context.add_violation(CustomerValidation::EmptyName);
         }
         if let Some(ref email) = self.email {
-            errors.map_and_merge_result(email.validate(), |()| CustomerValidation::Email)
+            context.map_and_merge_result(email.validate(), CustomerValidation::Email)
         }
         if let Some(ref phone) = self.phone {
-            errors.map_and_merge_result(phone.validate(), |()| CustomerValidation::Phone)
+            context.map_and_merge_result(phone.validate(), CustomerValidation::Phone)
         }
         // Either email or phone must be present
         if self.email.is_none() && self.phone.is_none() {
-            errors.add_error(CustomerValidation::ContactData, Validity::Missing);
+            context.add_violation(CustomerValidation::MissingContactData);
         }
-        errors.into_result()
+        context.finish_validation()
     }
 }
 
-#[derive(Copy, Clone, Debug, Default, Eq, PartialEq)]
-struct Quantity(pub usize);
+#[derive(Copy, Clone, Debug, Default, Eq, PartialEq, Ord, PartialOrd)]
+struct Quantity(usize);
 
-impl Validate<()> for Quantity {
-    fn validate(&self) -> ValidationResult<()> {
-        if self.0 >= 1 {
-            Ok(())
-        } else {
-            ValidationErrors::error((), Validity::too_few(1)).into_result()
+impl Quantity {
+    const fn min() -> Self {
+        Self(1)
+    }
+}
+
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
+enum QuantityValidation {
+    Min(Quantity),
+}
+
+impl Validate<QuantityValidation> for Quantity {
+    fn validate(&self) -> ValidationResult<QuantityValidation> {
+        let mut context = Self::start_validation();
+        if *self < Quantity::min() {
+            context.add_violation(QuantityValidation::Min(Self::min()));
         }
+        context.finish_validation()
     }
 }
 
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
 struct Reservation {
-    pub customer: Customer,
-    pub quantity: Quantity,
+    customer: Customer,
+    quantity: Quantity,
 }
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
-pub enum ReservationValidation {
+enum ReservationValidation {
     Customer(CustomerValidation),
-    Quantity,
+    Quantity(QuantityValidation),
 }
 
 impl Validate<ReservationValidation> for Reservation {
     fn validate(&self) -> ValidationResult<ReservationValidation> {
-        let mut errors = Self::start_validation();
-        errors.map_and_merge_result(self.customer.validate(), ReservationValidation::Customer);
-        errors.map_and_merge_result(self.quantity.validate(), |()| ReservationValidation::Quantity);
-        errors.into_result()
+        let mut context = Self::start_validation();
+        context.map_and_merge_result(self.customer.validate(), ReservationValidation::Customer);
+        context.map_and_merge_result(self.quantity.validate(), ReservationValidation::Quantity);
+        context.finish_validation()
     }
 }
 
 fn main() {
-    let default_reservation = Reservation::default();
-    println!("Validate {:?}: {:?}", default_reservation, default_reservation.validate());
+    let mut reservation = Reservation::default();
+    println!("{:?}: {:?}", reservation, reservation.validate());
+
+    reservation.customer.email = Some(Email("a@b@c".to_string()));
+    println!("{:?}: {:?}", reservation, reservation.validate());
+
+    reservation.customer.name = "Mr X".to_string();
+    reservation.customer.email = Some(Email("a@b.c".to_string()));
+    reservation.quantity = Quantity(4);
+    println!("{:?}: {:?}", reservation, reservation.validate());
 }
