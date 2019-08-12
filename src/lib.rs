@@ -1,15 +1,16 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
+pub mod context;
 pub mod error;
 
 pub mod prelude {
     pub use super::{
-        error::Error as ValidationError, error::Errors as ValidationErrors,
+        error::Error as ValidationError, context::Context as ValidationContext,
         Result as ValidationResult, Validate, Validation, Validity,
     };
 }
 
-use error::Errors;
+use context::Context;
 
 use core::{any::Any, fmt::{self, Debug, Display, Formatter}};
 
@@ -96,7 +97,7 @@ impl Display for Validity {
     }
 }
 
-pub type Result<T> = core::result::Result<(), Errors<T>>;
+pub type Result<T> = core::result::Result<(), Context<T>>;
 
 /// A `Validation` defines the context for validating certain objectives.
 /// These types are typically an `enum`s with one variant per objective.
@@ -116,10 +117,28 @@ pub trait Validate<T>
 where
     T: Validation,
 {
-    /// Validate this instance.
+    /// Perform validation.
     fn validate(&self) -> Result<T>;
 
-    fn start_validation() -> Errors<T> {
-        Errors::default()
+    fn start_validation() -> Context<T> {
+        Context::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    struct Dummy;
+
+    impl Validate<()> for Dummy {
+        fn validate(&self) -> Result<()> {
+            Self::start_validation().finish_validation()
+        }
+    }
+
+    #[test]
+    fn validate_dummy() {
+        assert!(Dummy.validate().is_ok());
     }
 }
