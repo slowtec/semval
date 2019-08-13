@@ -45,12 +45,13 @@ impl<V> Validation for V where V: Any + Debug {}
 /// Validation is expected to be an expensive operation that should
 /// only be invoked when crossing boundaries between independent
 /// components.
-pub trait Validate<V>
-where
-    V: Validation,
+pub trait Validate
 {
+    /// Validation objectives
+    type Validation: Validation;
+
     /// Perform the validation
-    fn validate(&self) -> Result<V>;
+    fn validate(&self) -> Result<Self::Validation>;
 }
 
 #[cfg(test)]
@@ -59,8 +60,10 @@ mod tests {
 
     struct Dummy;
 
-    impl Validate<()> for Dummy {
-        fn validate(&self) -> Result<()> {
+    impl Validate for Dummy {
+        type Validation = ();
+
+        fn validate(&self) -> Result<Self::Validation> {
             Context::default().into_result()
         }
     }

@@ -16,8 +16,10 @@ enum EmailValidation {
     InvalidFormat,
 }
 
-impl Validate<EmailValidation> for Email {
-    fn validate(&self) -> ValidationResult<EmailValidation> {
+impl Validate for Email {
+    type Validation = EmailValidation;
+
+    fn validate(&self) -> ValidationResult<Self::Validation> {
         let mut context = ValidationContext::default();
         if self.0.len() < Self::min_len() {
             context.add_violation(EmailValidation::MinLen(Self::min_len()));
@@ -43,8 +45,10 @@ enum PhoneValidation {
     MinLen(usize),
 }
 
-impl Validate<PhoneValidation> for Phone {
-    fn validate(&self) -> ValidationResult<PhoneValidation> {
+impl Validate for Phone {
+    type Validation = PhoneValidation;
+
+    fn validate(&self) -> ValidationResult<Self::Validation> {
         let mut context = ValidationContext::default();
         if self.0.chars().filter(|c| !c.is_whitespace()).count() < Self::min_len() {
             context.add_violation(PhoneValidation::MinLen(Self::min_len()));
@@ -66,8 +70,10 @@ enum ContactDataValidation {
     Incomplete,
 }
 
-impl Validate<ContactDataValidation> for ContactData {
-    fn validate(&self) -> ValidationResult<ContactDataValidation> {
+impl Validate for ContactData {
+    type Validation = ContactDataValidation;
+
+    fn validate(&self) -> ValidationResult<Self::Validation> {
         let mut context = ValidationContext::default();
         if let Some(ref email) = self.email {
             context.map_and_merge_result(email.validate(), ContactDataValidation::Email)
@@ -95,8 +101,10 @@ enum CustomerValidation {
     ContactData(ContactDataValidation),
 }
 
-impl Validate<CustomerValidation> for Customer {
-    fn validate(&self) -> ValidationResult<CustomerValidation> {
+impl Validate for Customer {
+    type Validation = CustomerValidation;
+
+    fn validate(&self) -> ValidationResult<Self::Validation> {
         let mut context = ValidationContext::default();
         if self.name.is_empty() {
             context.add_violation(CustomerValidation::NameEmpty);
@@ -120,8 +128,10 @@ enum QuantityValidation {
     Min(Quantity),
 }
 
-impl Validate<QuantityValidation> for Quantity {
-    fn validate(&self) -> ValidationResult<QuantityValidation> {
+impl Validate for Quantity {
+    type Validation = QuantityValidation;
+
+    fn validate(&self) -> ValidationResult<Self::Validation> {
         let mut context = ValidationContext::default();
         if *self < Quantity::min() {
             context.add_violation(QuantityValidation::Min(Self::min()));
@@ -142,8 +152,10 @@ enum ReservationValidation {
     Quantity(QuantityValidation),
 }
 
-impl Validate<ReservationValidation> for Reservation {
-    fn validate(&self) -> ValidationResult<ReservationValidation> {
+impl Validate for Reservation {
+    type Validation = ReservationValidation;
+
+    fn validate(&self) -> ValidationResult<Self::Validation> {
         let mut context = ValidationContext::default();
         context.map_and_merge_result(self.customer.validate(), ReservationValidation::Customer);
         context.map_and_merge_result(self.quantity.validate(), ReservationValidation::Quantity);
