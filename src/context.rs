@@ -47,10 +47,10 @@ where
     V: Validation,
 {
     fn default() -> Self {
-         Self {
+        Self {
             violations: smallvec![],
         }
-   }
+    }
 }
 
 impl<V> Context<V>

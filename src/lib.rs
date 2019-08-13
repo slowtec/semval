@@ -1,7 +1,6 @@
 #![deny(missing_docs)]
 #![deny(missing_debug_implementations)]
 #![cfg_attr(test, deny(warnings))]
-
 #![cfg_attr(not(feature = "std"), no_std)]
 
 //! # semval
@@ -47,8 +46,7 @@ impl<V> Validation for V where V: Any + Debug {}
 /// Validation is expected to be an expensive operation that should
 /// only be invoked when crossing boundaries between independent
 /// components.
-pub trait Validate
-{
+pub trait Validate {
     /// Validation objectives
     type Validation: Validation;
 

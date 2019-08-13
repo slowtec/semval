@@ -109,7 +109,10 @@ impl Validate for Customer {
         if self.name.is_empty() {
             context.add_violation(CustomerValidation::NameEmpty);
         }
-        context.map_and_merge_result(self.contact_data.validate(), CustomerValidation::ContactData);
+        context.map_and_merge_result(
+            self.contact_data.validate(),
+            CustomerValidation::ContactData,
+        );
         context.into_result()
     }
 }
