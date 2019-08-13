@@ -50,12 +50,17 @@ impl<V> Context<V>
 where
     V: Validation,
 {
-    /// Check if the context has violations
+    /// The violations collected so far
+    pub fn violations(&self) -> impl Iterator<Item = &V> {
+        self.violations.iter()
+    }
+
+    /// Check if the context already has any violations
     pub fn has_violations(&self) -> bool {
         !self.violations.is_empty()
     }
 
-    /// Count the number of violations in the context
+    /// Count the number of violations collected so far
     pub fn count_violations(&self) -> usize {
         self.violations.len()
     }
@@ -73,14 +78,14 @@ where
         }
     }
 
-    /// Merge with a validation result
+    /// Merge a validation result into the context
     pub fn merge_result(&mut self, res: Result<V>) {
         if let Err(other) = res {
             self.merge_violations(other);
         }
     }
 
-    /// Merge with an unrelated validation result
+    /// Merge an unrelated validation into the context
     pub fn map_and_merge_result<F, U>(&mut self, res: Result<U>, map: F)
     where
         F: Fn(U) -> V,
@@ -95,6 +100,9 @@ where
     }
 
     /// Finish the current validation with a result
+    ///
+    /// Returns `Err` with the context's violations or `Ok` if
+    /// the context does not have any violations.
     pub fn into_result(self) -> Result<V> {
         if self.violations.is_empty() {
             Ok(())
