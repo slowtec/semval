@@ -6,7 +6,9 @@
 
 //! # semval
 //!
-//! A lightweight, composable framework for semantic validation in Rust.
+//! A lightweight and versatile toolbox for implementing semantic validation.
+//!
+//! Please refer to the bundled `reservation.rs` example to get an idea of how it works.
 //!
 //! Without any macro magic, at least not now.
 
@@ -29,7 +31,7 @@ use core::{any::Any, fmt::Debug};
 /// Result of a validation
 pub type Result<V> = core::result::Result<(), Context<V>>;
 
-/// Objectives that might be violated
+/// Validation objectives that might be violated
 ///
 /// A validation fails if one or more objectives are violated.
 ///

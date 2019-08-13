@@ -8,11 +8,13 @@
 [![Apache 2.0 licensed](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](./LICENSE-APACHE)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE-MIT)
 
-A lightweight, composable framework for semantic validation in Rust.
+***Work in progress! Expect braking changes and no changelog until v0.1.0 is released.***
+
+A lightweight and versatile toolbox for semantic validation in Rust.
+
+Please refer to the bundled [*Reservation*](examples/reservation.rs) example to get an idea of how it works.
 
 Without any macro magic, at least not now.
-
-***Work in progress***
 
 ## License
 
