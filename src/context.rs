@@ -23,15 +23,22 @@ where
 }
 
 #[cfg(feature = "std")]
-impl<V> StdError for Context<V> where V: Validation {}
+impl<V> StdError for Context<V> where V: Validation + Display {}
 
 impl<V> Display for Context<V>
 where
-    V: Validation,
+    V: Validation + Display,
 {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        // TODO
-        write!(f, "{:?}", self)
+        f.write_str("[")?;
+        for (i, v) in self.violations().enumerate() {
+            if i > 0 {
+                f.write_str(" ")?;
+            }
+            write!(f, "{}", v)?;
+        }
+        f.write_str("]")?;
+        Ok(())
     }
 }
 
