@@ -27,7 +27,7 @@ use context::Context;
 use core::{any::Any, fmt::Debug};
 
 /// Result of a validation
-pub type Result<T> = core::result::Result<(), Context<T>>;
+pub type Result<V> = core::result::Result<(), Context<V>>;
 
 /// Objectives that might be violated
 ///
@@ -38,19 +38,19 @@ pub type Result<T> = core::result::Result<(), Context<T>>;
 /// to trace back the root cause.
 pub trait Validation: Any + Debug {}
 
-impl<T> Validation for T where T: Any + Debug {}
+impl<V> Validation for V where V: Any + Debug {}
 
 /// A trait for validating types
 ///
 /// Validation is expected to be an expensive operation that should
 /// only be invoked when crossing boundaries between independent
 /// components.
-pub trait Validate<T>
+pub trait Validate<V>
 where
-    T: Validation,
+    V: Validation,
 {
     /// Perform the validation
-    fn validate(&self) -> Result<T>;
+    fn validate(&self) -> Result<V>;
 }
 
 #[cfg(test)]

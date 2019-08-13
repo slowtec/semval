@@ -12,7 +12,7 @@ A lightweight, composable framework for semantic validation in Rust.
 
 Without any macro magic, at least not now.
 
-***Work in progress - do not use, yet!***
+***Work in progress***
 
 ## License
 

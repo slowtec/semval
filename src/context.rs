@@ -8,26 +8,26 @@ use smallvec::{smallvec, SmallVec};
 
 const SMALLVEC_ARRAY_LEN: usize = 8;
 
-type SmallVecArray<T> = [T; SMALLVEC_ARRAY_LEN];
+type SmallVecArray<V> = [V; SMALLVEC_ARRAY_LEN];
 
 /// A collection of violations resulting from a validation
 ///
 /// Collects violations that are detected while performing
 /// a validation.
 #[derive(Clone, Debug)]
-pub struct Context<T>
+pub struct Context<V>
 where
-    T: Validation,
+    V: Validation,
 {
-    violations: SmallVec<SmallVecArray<T>>,
+    violations: SmallVec<SmallVecArray<V>>,
 }
 
 #[cfg(feature = "std")]
-impl<T> StdError for Context<T> where T: Validation {}
+impl<V> StdError for Context<V> where V: Validation {}
 
-impl<T> Display for Context<T>
+impl<V> Display for Context<V>
 where
-    T: Validation,
+    V: Validation,
 {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         // TODO
@@ -35,9 +35,9 @@ where
     }
 }
 
-impl<T> Default for Context<T>
+impl<V> Default for Context<V>
 where
-    T: Validation,
+    V: Validation,
 {
     fn default() -> Self {
          Self {
@@ -46,9 +46,9 @@ where
    }
 }
 
-impl<T> Context<T>
+impl<V> Context<V>
 where
-    T: Validation,
+    V: Validation,
 {
     /// Check if the context has violations
     pub fn has_violations(&self) -> bool {
@@ -61,12 +61,12 @@ where
     }
 
     /// Add a new violation to the context
-    pub fn add_violation(&mut self, violation: impl Into<T>) {
+    pub fn add_violation(&mut self, violation: impl Into<V>) {
         self.violations.push(violation.into());
     }
 
     /// Merge with another context
-    pub fn merge_violations(&mut self, other: Self) {
+    fn merge_violations(&mut self, other: Self) {
         self.violations.reserve(other.violations.len());
         for error in other.violations.into_iter() {
             self.violations.push(error);
@@ -74,17 +74,17 @@ where
     }
 
     /// Merge with a validation result
-    pub fn merge_result(&mut self, res: Result<T>) {
+    pub fn merge_result(&mut self, res: Result<V>) {
         if let Err(other) = res {
             self.merge_violations(other);
         }
     }
 
     /// Merge with an unrelated validation result
-    pub fn map_and_merge_result<F, V>(&mut self, res: Result<V>, map: F)
+    pub fn map_and_merge_result<F, U>(&mut self, res: Result<U>, map: F)
     where
-        F: Fn(V) -> T,
-        V: Validation,
+        F: Fn(U) -> V,
+        U: Validation,
     {
         if let Err(other) = res {
             self.violations.reserve(other.violations.len());
@@ -95,7 +95,7 @@ where
     }
 
     /// Finish the current validation with a result
-    pub fn into_result(self) -> Result<T> {
+    pub fn into_result(self) -> Result<V> {
         if self.violations.is_empty() {
             Ok(())
         } else {
@@ -104,12 +104,12 @@ where
     }
 }
 
-impl<T> IntoIterator for Context<T>
+impl<V> IntoIterator for Context<V>
 where
-    T: Validation,
+    V: Validation,
 {
-    type Item = T;
-    type IntoIter = smallvec::IntoIter<SmallVecArray<T>>;
+    type Item = V;
+    type IntoIter = smallvec::IntoIter<SmallVecArray<V>>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.violations.into_iter()
