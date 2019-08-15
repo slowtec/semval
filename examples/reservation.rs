@@ -21,12 +21,14 @@ impl Validate for Email {
 
     fn validate(&self) -> ValidationResult<Self::Validation> {
         let mut context = ValidationContext::default();
-        if self.0.len() < Self::min_len() {
-            context.add_violation(EmailValidation::MinLen(Self::min_len()));
-        }
-        if self.0.chars().filter(|c| *c == '@').count() != 1 {
-            context.add_violation(EmailValidation::InvalidFormat);
-        }
+        context.add_violation_if(
+            self.0.len() < Self::min_len(),
+            EmailValidation::MinLen(Self::min_len()),
+        );
+        context.add_violation_if(
+            self.0.chars().filter(|c| *c == '@').count() != 1,
+            EmailValidation::InvalidFormat,
+        );
         context.into_result()
     }
 }
@@ -50,9 +52,10 @@ impl Validate for Phone {
 
     fn validate(&self) -> ValidationResult<Self::Validation> {
         let mut context = ValidationContext::default();
-        if self.0.chars().filter(|c| !c.is_whitespace()).count() < Self::min_len() {
-            context.add_violation(PhoneValidation::MinLen(Self::min_len()));
-        }
+        context.add_violation_if(
+            self.0.chars().filter(|c| !c.is_whitespace()).count() >= Self::min_len(),
+            PhoneValidation::MinLen(Self::min_len()),
+        );
         context.into_result()
     }
 }
@@ -82,9 +85,10 @@ impl Validate for ContactData {
             context.map_and_merge_result(phone.validate(), ContactDataValidation::Phone)
         }
         // Either email or phone must be present
-        if self.email.is_none() && self.phone.is_none() {
-            context.add_violation(ContactDataValidation::Incomplete);
-        }
+        context.add_violation_if(
+            self.email.is_none() && self.phone.is_none(),
+            ContactDataValidation::Incomplete,
+        );
         context.into_result()
     }
 }
@@ -106,9 +110,7 @@ impl Validate for Customer {
 
     fn validate(&self) -> ValidationResult<Self::Validation> {
         let mut context = ValidationContext::default();
-        if self.name.is_empty() {
-            context.add_violation(CustomerValidation::NameEmpty);
-        }
+        context.add_violation_if(self.name.is_empty(), CustomerValidation::NameEmpty);
         context.map_and_merge_result(
             self.contact_data.validate(),
             CustomerValidation::ContactData,
@@ -136,9 +138,10 @@ impl Validate for Quantity {
 
     fn validate(&self) -> ValidationResult<Self::Validation> {
         let mut context = ValidationContext::default();
-        if *self < Quantity::min() {
-            context.add_violation(QuantityValidation::Min(Self::min()));
-        }
+        context.add_violation_if(
+            *self < Quantity::min(),
+            QuantityValidation::Min(Self::min()),
+        );
         context.into_result()
     }
 }

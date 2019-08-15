@@ -77,6 +77,13 @@ where
         self.violations.push(violation.into());
     }
 
+    /// Conditionally add a new violation to the context
+    pub fn add_violation_if(&mut self, cond: bool, violation: impl Into<V>) {
+        if cond {
+            self.add_violation(violation);
+        }
+    }
+
     /// Merge with another context
     fn merge_violations(&mut self, other: Self) {
         self.violations.reserve(other.violations.len());
