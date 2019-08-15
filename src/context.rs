@@ -58,26 +58,31 @@ where
     V: Validation,
 {
     /// The violations collected so far
+    #[inline]
     pub fn violations(&self) -> impl Iterator<Item = &V> {
         self.violations.iter()
     }
 
     /// Check if the context already has any violations
+    #[inline]
     pub fn has_violations(&self) -> bool {
         !self.violations.is_empty()
     }
 
     /// Count the number of violations collected so far
+    #[inline]
     pub fn count_violations(&self) -> usize {
         self.violations.len()
     }
 
     /// Add a new violation to the context
+    #[inline]
     pub fn add_violation(&mut self, violation: impl Into<V>) {
         self.violations.push(violation.into());
     }
 
     /// Conditionally add a new violation to the context
+    #[inline]
     pub fn add_violation_if(&mut self, cond: bool, violation: impl Into<V>) {
         if cond {
             self.add_violation(violation);
@@ -93,6 +98,7 @@ where
     }
 
     /// Merge a validation result into the context
+    #[inline]
     pub fn merge_result(&mut self, res: Result<V>) {
         if let Err(other) = res {
             self.merge_violations(other);
