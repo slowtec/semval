@@ -5,6 +5,20 @@ language: rust
 rust:
   - stable
 
+# necessary for `cargo coveralls`
+addons:
+  apt:
+    packages:
+      - sqlite3
+      - libsqlite3-dev
+      - libcurl4-openssl-dev
+      - libelf-dev
+      - libdw-dev
+      - binutils-dev # optional: only required for the --verify flag of coveralls
+      - cmake
+    sources:
+      - kalakris-cmake
+
 matrix:
   fast_finish: true
 
