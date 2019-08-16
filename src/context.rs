@@ -160,12 +160,15 @@ mod tests {
     fn add_error() {
         let mut context = Context::<()>::default();
         assert!(!context.has_violations());
-        for _ in 0..=SMALLVEC_ARRAY_LEN + 1 {
+        for _ in 0..=SMALLVEC_ARRAY_LEN {
             let violations_before = context.count_violations();
             context.add_violation(());
             assert!(context.has_violations());
             let violations_after = context.count_violations();
             assert_eq!(violations_after, violations_before + 1);
         }
+        assert_eq!(SMALLVEC_ARRAY_LEN + 1, context.count_violations());
+        assert_eq!(context.count_violations(), context.violations().count());
+        assert!(context.into_result().is_err());
     }
 }
