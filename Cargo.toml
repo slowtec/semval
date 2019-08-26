@@ -2,7 +2,7 @@
 name = "semval"
 description = "Semantic validation"
 keywords = ["semantic", "validation"]
-version = "0.0.2"
+version = "0.0.3"
 license = "Apache-2.0 OR MIT"
 readme = "README.md"
 authors = ["Uwe Klotz <uwe.klotz@gmail.com>"]
