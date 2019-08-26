@@ -1,5 +1,11 @@
 use semval::prelude::*;
 
+#[derive(Copy, Clone, Debug, Default, Eq, PartialEq)]
+pub struct UnexpectedValue<T> {
+    pub expected: T,
+    pub actual: T,
+}
+
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
 struct Email(String);
 
@@ -12,7 +18,7 @@ impl Email {
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 enum EmailValidation {
-    MinLen(usize),
+    MinLen(UnexpectedValue<usize>),
     InvalidFormat,
 }
 
@@ -23,7 +29,10 @@ impl Validate for Email {
         let mut context = ValidationContext::default();
         context.add_violation_if(
             self.0.len() < Self::min_len(),
-            EmailValidation::MinLen(Self::min_len()),
+            EmailValidation::MinLen(UnexpectedValue {
+                expected: Self::min_len(),
+                actual: self.0.len(),
+            }),
         );
         context.add_violation_if(
             self.0.chars().filter(|c| *c == '@').count() != 1,
@@ -44,7 +53,7 @@ impl Phone {
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 enum PhoneValidation {
-    MinLen(usize),
+    MinLen(UnexpectedValue<usize>),
 }
 
 impl Validate for Phone {
@@ -52,9 +61,13 @@ impl Validate for Phone {
 
     fn validate(&self) -> ValidationResult<Self::Validation> {
         let mut context = ValidationContext::default();
+        let len = self.0.chars().filter(|c| !c.is_whitespace()).count();
         context.add_violation_if(
-            self.0.chars().filter(|c| !c.is_whitespace()).count() >= Self::min_len(),
-            PhoneValidation::MinLen(Self::min_len()),
+            len < Self::min_len(),
+            PhoneValidation::MinLen(UnexpectedValue {
+                expected: Self::min_len(),
+                actual: len,
+            }),
         );
         context.into_result()
     }
@@ -130,7 +143,7 @@ impl Quantity {
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 enum QuantityValidation {
-    Min(Quantity),
+    Min(UnexpectedValue<Quantity>),
 }
 
 impl Validate for Quantity {
@@ -139,8 +152,11 @@ impl Validate for Quantity {
     fn validate(&self) -> ValidationResult<Self::Validation> {
         let mut context = ValidationContext::default();
         context.add_violation_if(
-            *self < Quantity::min(),
-            QuantityValidation::Min(Self::min()),
+            *self < Self::min(),
+            QuantityValidation::Min(UnexpectedValue {
+                expected: Self::min(),
+                actual: *self,
+            }),
         );
         context.into_result()
     }
@@ -177,7 +193,12 @@ fn main() {
     println!("{:?}: {:?}", reservation, reservation.validate());
 
     reservation.customer.name = "Mr X".to_string();
-    reservation.customer.contact_data.email = Some(Email("a@b.c".to_string()));
+    reservation.customer.contact_data.phone = Some(Phone("0 123".to_string()));
+    reservation.customer.contact_data.email = None;
     reservation.quantity = Quantity(4);
+    println!("{:?}: {:?}", reservation, reservation.validate());
+
+    reservation.customer.contact_data.phone = None;
+    reservation.customer.contact_data.email = Some(Email("a@b.c".to_string()));
     println!("{:?}: {:?}", reservation, reservation.validate());
 }
