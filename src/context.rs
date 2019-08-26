@@ -4,7 +4,7 @@ use core::fmt::{self, Display, Formatter};
 
 use std::error::Error as StdError;
 
-use smallvec::{smallvec, SmallVec};
+use smallvec::SmallVec;
 
 const SMALLVEC_ARRAY_LEN: usize = 8;
 
@@ -15,6 +15,7 @@ type SmallVecArray<V> = [V; SMALLVEC_ARRAY_LEN];
 /// Collects violations that are detected while performing
 /// a validation.
 #[derive(Clone, Debug)]
+#[cfg_attr(test, derive(Eq, PartialEq))]
 pub struct Context<V>
 where
     V: Validation,
@@ -47,9 +48,7 @@ where
     V: Validation,
 {
     fn default() -> Self {
-        Self {
-            violations: smallvec![],
-        }
+        Self::valid()
     }
 }
 
@@ -57,6 +56,14 @@ impl<V> Context<V>
 where
     V: Validation,
 {
+    /// Create a new valid context without any violations.
+    #[inline]
+    pub fn valid() -> Self {
+        Self {
+            violations: SmallVec::new(),
+        }
+    }
+
     /// The violations collected so far
     #[inline]
     pub fn violations(&self) -> impl Iterator<Item = &V> {
@@ -158,16 +165,21 @@ mod tests {
     use super::*;
 
     #[test]
-    fn default_context() {
-        let context = Context::<()>::default();
+    fn valid_context() {
+        let context = Context::<()>::valid();
         assert!(!context.has_violations());
         assert_eq!(0, context.count_violations());
         assert!(context.into_result().is_ok());
     }
 
     #[test]
+    fn default_context() {
+        assert_eq!(Context::<()>::valid(), Context::<()>::default());
+    }
+
+    #[test]
     fn add_error() {
-        let mut context = Context::<()>::default();
+        let mut context = Context::<()>::valid();
         assert!(!context.has_violations());
         for _ in 0..=SMALLVEC_ARRAY_LEN {
             let violations_before = context.count_violations();

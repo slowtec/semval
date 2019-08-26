@@ -64,7 +64,7 @@ mod tests {
         type Validation = ();
 
         fn validate(&self) -> Result<Self::Validation> {
-            Context::default().into_result()
+            Context::valid().into()
         }
     }
 

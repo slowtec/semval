@@ -26,7 +26,7 @@ impl Validate for Email {
     type Validation = EmailValidation;
 
     fn validate(&self) -> ValidationResult<Self::Validation> {
-        let mut context = ValidationContext::default();
+        let mut context = ValidationContext::valid();
         context.add_violation_if(
             self.0.len() < Self::min_len(),
             EmailValidation::MinLen(UnexpectedValue {
@@ -60,7 +60,7 @@ impl Validate for Phone {
     type Validation = PhoneValidation;
 
     fn validate(&self) -> ValidationResult<Self::Validation> {
-        let mut context = ValidationContext::default();
+        let mut context = ValidationContext::valid();
         let len = self.0.chars().filter(|c| !c.is_whitespace()).count();
         context.add_violation_if(
             len < Self::min_len(),
@@ -90,7 +90,7 @@ impl Validate for ContactData {
     type Validation = ContactDataValidation;
 
     fn validate(&self) -> ValidationResult<Self::Validation> {
-        let mut context = ValidationContext::default();
+        let mut context = ValidationContext::valid();
         if let Some(ref email) = self.email {
             context.map_and_merge_result(email.validate(), ContactDataValidation::Email)
         }
@@ -122,7 +122,7 @@ impl Validate for Customer {
     type Validation = CustomerValidation;
 
     fn validate(&self) -> ValidationResult<Self::Validation> {
-        let mut context = ValidationContext::default();
+        let mut context = ValidationContext::valid();
         context.add_violation_if(self.name.is_empty(), CustomerValidation::NameEmpty);
         context.map_and_merge_result(
             self.contact_data.validate(),
@@ -150,7 +150,7 @@ impl Validate for Quantity {
     type Validation = QuantityValidation;
 
     fn validate(&self) -> ValidationResult<Self::Validation> {
-        let mut context = ValidationContext::default();
+        let mut context = ValidationContext::valid();
         context.add_violation_if(
             *self < Self::min(),
             QuantityValidation::Min(UnexpectedValue {
@@ -178,7 +178,7 @@ impl Validate for Reservation {
     type Validation = ReservationValidation;
 
     fn validate(&self) -> ValidationResult<Self::Validation> {
-        let mut context = ValidationContext::default();
+        let mut context = ValidationContext::valid();
         context.map_and_merge_result(self.customer.validate(), ReservationValidation::Customer);
         context.map_and_merge_result(self.quantity.validate(), ReservationValidation::Quantity);
         context.into()
