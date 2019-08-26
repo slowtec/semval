@@ -38,7 +38,7 @@ impl Validate for Email {
             self.0.chars().filter(|c| *c == '@').count() != 1,
             EmailValidation::InvalidFormat,
         );
-        context.into_result()
+        context.into()
     }
 }
 
@@ -69,7 +69,7 @@ impl Validate for Phone {
                 actual: len,
             }),
         );
-        context.into_result()
+        context.into()
     }
 }
 
@@ -102,7 +102,7 @@ impl Validate for ContactData {
             self.email.is_none() && self.phone.is_none(),
             ContactDataValidation::Incomplete,
         );
-        context.into_result()
+        context.into()
     }
 }
 
@@ -128,7 +128,7 @@ impl Validate for Customer {
             self.contact_data.validate(),
             CustomerValidation::ContactData,
         );
-        context.into_result()
+        context.into()
     }
 }
 
@@ -158,7 +158,7 @@ impl Validate for Quantity {
                 actual: *self,
             }),
         );
-        context.into_result()
+        context.into()
     }
 }
 
@@ -181,7 +181,7 @@ impl Validate for Reservation {
         let mut context = ValidationContext::default();
         context.map_and_merge_result(self.customer.validate(), ReservationValidation::Customer);
         context.map_and_merge_result(self.quantity.validate(), ReservationValidation::Quantity);
-        context.into_result()
+        context.into()
     }
 }
 

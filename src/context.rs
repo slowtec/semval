@@ -144,6 +144,15 @@ where
     }
 }
 
+impl<V> Into<Result<V>> for Context<V>
+where
+    V: Validation,
+{
+    fn into(self) -> Result<V> {
+        self.into_result()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
