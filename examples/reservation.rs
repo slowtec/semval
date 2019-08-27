@@ -1,11 +1,5 @@
 use semval::prelude::*;
 
-#[derive(Copy, Clone, Debug, Default, Eq, PartialEq)]
-pub struct UnexpectedValue<T> {
-    pub expected: T,
-    pub actual: T,
-}
-
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
 struct Email(String);
 
@@ -18,7 +12,7 @@ impl Email {
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 enum EmailInvalidity {
-    MinLen(UnexpectedValue<usize>),
+    MinLength,
     Format,
 }
 
@@ -29,10 +23,7 @@ impl Validate for Email {
         let mut context = ValidationContext::valid();
         context.invalidate_if(
             self.0.len() < Self::min_len(),
-            EmailInvalidity::MinLen(UnexpectedValue {
-                expected: Self::min_len(),
-                actual: self.0.len(),
-            }),
+            EmailInvalidity::MinLength,
         );
         context.invalidate_if(
             self.0.chars().filter(|c| *c == '@').count() != 1,
@@ -53,7 +44,7 @@ impl Phone {
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 enum PhoneInvalidity {
-    MinLen(UnexpectedValue<usize>),
+    MinLength,
 }
 
 impl Validate for Phone {
@@ -64,10 +55,7 @@ impl Validate for Phone {
         let len = self.0.chars().filter(|c| !c.is_whitespace()).count();
         context.invalidate_if(
             len < Self::min_len(),
-            PhoneInvalidity::MinLen(UnexpectedValue {
-                expected: Self::min_len(),
-                actual: len,
-            }),
+            PhoneInvalidity::MinLength,
         );
         context.into()
     }
@@ -143,7 +131,7 @@ impl Quantity {
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 enum QuantityInvalidity {
-    Min(UnexpectedValue<Quantity>),
+    MinValue,
 }
 
 impl Validate for Quantity {
@@ -153,10 +141,7 @@ impl Validate for Quantity {
         let mut context = ValidationContext::valid();
         context.invalidate_if(
             *self < Self::min(),
-            QuantityInvalidity::Min(UnexpectedValue {
-                expected: Self::min(),
-                actual: *self,
-            }),
+            QuantityInvalidity::MinValue,
         );
         context.into()
     }
