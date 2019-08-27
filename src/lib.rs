@@ -11,7 +11,7 @@
 //!
 //! Without any macro magic, at least not now.
 
-/// Validation context
+/// Invalidity context
 pub mod context;
 
 /// The crate's prelude
@@ -19,7 +19,7 @@ pub mod context;
 /// A proposed set of imports to ease usage of this crate.
 pub mod prelude {
     pub use super::{
-        context::Context as ValidationContext, Result as ValidationResult, Validate, Validation,
+        context::Context as ValidationContext, Result as ValidationResult, Validate, Invalidity,
     };
 }
 
@@ -29,21 +29,24 @@ use core::{any::Any, fmt::Debug};
 
 /// Result of a validation
 ///
-/// The result is `Ok` and empty if the validation succeeded
-/// or otherwise a validation context with one or more
-/// violations wrapped into `Err`.
+/// The result is `Ok` and empty if the validation succeeded. It is
+/// a validation context wrapped into `Err` that carries one or more
+/// invalidities.
+///
+/// In contrast to common results the actual payload is carried by
+/// the error variant while a successful result is just the unit type.
 pub type Result<V> = core::result::Result<(), Context<V>>;
 
-/// Validation objectives that might be violated
+/// Invalidities that cause validation failures
 ///
-/// A validation fails if one or more objectives are violated.
-///
-/// These types are typically `enum`s with one variant per objective.
-/// Some of the variants may recursively wrap dependent validations
-/// to trace back the root cause.
-pub trait Validation: Any + Debug {}
+/// Validations fail if one or more objectives are considered invalid.
+/// These invalidity objectives are typically represented by sum types
+/// (`enum`) with one variant per objective. Some of the variants may
+/// recursively wrap an invalidity of a subordinate validation to trace
+/// back root causes.
+pub trait Invalidity: Any + Debug {}
 
-impl<V> Validation for V where V: Any + Debug {}
+impl<V> Invalidity for V where V: Any + Debug {}
 
 /// A trait for validating types
 ///
@@ -51,11 +54,11 @@ impl<V> Validation for V where V: Any + Debug {}
 /// only be invoked when crossing boundaries between independent
 /// components.
 pub trait Validate {
-    /// Validation objectives
-    type Validation: Validation;
+    /// Invalidity objectives
+    type Invalidity: Invalidity;
 
     /// Perform the validation
-    fn validate(&self) -> Result<Self::Validation>;
+    fn validate(&self) -> Result<Self::Invalidity>;
 }
 
 #[cfg(test)]
@@ -65,9 +68,9 @@ mod tests {
     struct Dummy;
 
     impl Validate for Dummy {
-        type Validation = ();
+        type Invalidity = ();
 
-        fn validate(&self) -> Result<Self::Validation> {
+        fn validate(&self) -> Result<Self::Invalidity> {
             Context::valid().into()
         }
     }

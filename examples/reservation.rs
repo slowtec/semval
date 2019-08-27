@@ -17,26 +17,26 @@ impl Email {
 }
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
-enum EmailValidation {
+enum EmailInvalidity {
     MinLen(UnexpectedValue<usize>),
-    InvalidFormat,
+    Format,
 }
 
 impl Validate for Email {
-    type Validation = EmailValidation;
+    type Invalidity = EmailInvalidity;
 
-    fn validate(&self) -> ValidationResult<Self::Validation> {
+    fn validate(&self) -> ValidationResult<Self::Invalidity> {
         let mut context = ValidationContext::valid();
-        context.add_violation_if(
+        context.invalidate_if(
             self.0.len() < Self::min_len(),
-            EmailValidation::MinLen(UnexpectedValue {
+            EmailInvalidity::MinLen(UnexpectedValue {
                 expected: Self::min_len(),
                 actual: self.0.len(),
             }),
         );
-        context.add_violation_if(
+        context.invalidate_if(
             self.0.chars().filter(|c| *c == '@').count() != 1,
-            EmailValidation::InvalidFormat,
+            EmailInvalidity::Format,
         );
         context.into()
     }
@@ -52,19 +52,19 @@ impl Phone {
 }
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
-enum PhoneValidation {
+enum PhoneInvalidity {
     MinLen(UnexpectedValue<usize>),
 }
 
 impl Validate for Phone {
-    type Validation = PhoneValidation;
+    type Invalidity = PhoneInvalidity;
 
-    fn validate(&self) -> ValidationResult<Self::Validation> {
+    fn validate(&self) -> ValidationResult<Self::Invalidity> {
         let mut context = ValidationContext::valid();
         let len = self.0.chars().filter(|c| !c.is_whitespace()).count();
-        context.add_violation_if(
+        context.invalidate_if(
             len < Self::min_len(),
-            PhoneValidation::MinLen(UnexpectedValue {
+            PhoneInvalidity::MinLen(UnexpectedValue {
                 expected: Self::min_len(),
                 actual: len,
             }),
@@ -80,27 +80,27 @@ struct ContactData {
 }
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
-enum ContactDataValidation {
-    Phone(PhoneValidation),
-    Email(EmailValidation),
+enum ContactDataInvalidity {
+    Phone(PhoneInvalidity),
+    Email(EmailInvalidity),
     Incomplete,
 }
 
 impl Validate for ContactData {
-    type Validation = ContactDataValidation;
+    type Invalidity = ContactDataInvalidity;
 
-    fn validate(&self) -> ValidationResult<Self::Validation> {
+    fn validate(&self) -> ValidationResult<Self::Invalidity> {
         let mut context = ValidationContext::valid();
         if let Some(ref email) = self.email {
-            context.validate_and_map(email, ContactDataValidation::Email)
+            context.validate_and_map(email, ContactDataInvalidity::Email)
         }
         if let Some(ref phone) = self.phone {
-            context.validate_and_map(phone, ContactDataValidation::Phone)
+            context.validate_and_map(phone, ContactDataInvalidity::Phone)
         }
         // Either email or phone must be present
-        context.add_violation_if(
+        context.invalidate_if(
             self.email.is_none() && self.phone.is_none(),
-            ContactDataValidation::Incomplete,
+            ContactDataInvalidity::Incomplete,
         );
         context.into()
     }
@@ -113,20 +113,20 @@ struct Customer {
 }
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
-enum CustomerValidation {
+enum CustomerInvalidity {
     NameEmpty,
-    ContactData(ContactDataValidation),
+    ContactData(ContactDataInvalidity),
 }
 
 impl Validate for Customer {
-    type Validation = CustomerValidation;
+    type Invalidity = CustomerInvalidity;
 
-    fn validate(&self) -> ValidationResult<Self::Validation> {
+    fn validate(&self) -> ValidationResult<Self::Invalidity> {
         let mut context = ValidationContext::valid();
-        context.add_violation_if(self.name.is_empty(), CustomerValidation::NameEmpty);
+        context.invalidate_if(self.name.is_empty(), CustomerInvalidity::NameEmpty);
         context.validate_and_map(
             &self.contact_data,
-            CustomerValidation::ContactData,
+            CustomerInvalidity::ContactData,
         );
         context.into()
     }
@@ -142,18 +142,18 @@ impl Quantity {
 }
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
-enum QuantityValidation {
+enum QuantityInvalidity {
     Min(UnexpectedValue<Quantity>),
 }
 
 impl Validate for Quantity {
-    type Validation = QuantityValidation;
+    type Invalidity = QuantityInvalidity;
 
-    fn validate(&self) -> ValidationResult<Self::Validation> {
+    fn validate(&self) -> ValidationResult<Self::Invalidity> {
         let mut context = ValidationContext::valid();
-        context.add_violation_if(
+        context.invalidate_if(
             *self < Self::min(),
-            QuantityValidation::Min(UnexpectedValue {
+            QuantityInvalidity::Min(UnexpectedValue {
                 expected: Self::min(),
                 actual: *self,
             }),
@@ -169,18 +169,18 @@ struct Reservation {
 }
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
-enum ReservationValidation {
-    Customer(CustomerValidation),
-    Quantity(QuantityValidation),
+enum ReservationInvalidity {
+    Customer(CustomerInvalidity),
+    Quantity(QuantityInvalidity),
 }
 
 impl Validate for Reservation {
-    type Validation = ReservationValidation;
+    type Invalidity = ReservationInvalidity;
 
-    fn validate(&self) -> ValidationResult<Self::Validation> {
+    fn validate(&self) -> ValidationResult<Self::Invalidity> {
         let mut context = ValidationContext::valid();
-        context.validate_and_map(&self.customer, ReservationValidation::Customer);
-        context.validate_and_map(&self.quantity, ReservationValidation::Quantity);
+        context.validate_and_map(&self.customer, ReservationInvalidity::Customer);
+        context.validate_and_map(&self.quantity, ReservationInvalidity::Quantity);
         context.into()
     }
 }
