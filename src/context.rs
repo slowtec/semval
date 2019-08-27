@@ -63,16 +63,16 @@ where
         }
     }
 
-    // TODO: Make public?
+    /// Merge the results of another validation
     #[inline]
-    fn merge_result(&mut self, res: Result<V>) {
+    pub fn merge_result(&mut self, res: Result<V>) {
         if let Err(other) = res {
             self.merge(other);
         }
     }
 
-    // TODO: Make public?
-    fn map_and_merge_result<F, U>(&mut self, res: Result<U>, map: F)
+    /// Merge the mapped results of another validation
+    pub fn map_and_merge_result<F, U>(&mut self, res: Result<U>, map: F)
     where
         F: Fn(U) -> V,
         U: Invalidity,
