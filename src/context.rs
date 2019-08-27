@@ -27,7 +27,7 @@ impl<V> Context<V>
 where
     V: Invalidity,
 {
-    /// Create a new valid context
+    /// Create a new valid and empty context
     #[inline]
     pub fn valid() -> Self {
         Self {
@@ -39,20 +39,6 @@ where
     #[inline]
     pub fn is_valid(&self) -> bool {
         !self.invalidities.is_empty()
-    }
-
-    /// All validation failures collected so far
-    #[inline]
-    pub fn invalidities(&self) -> impl Iterator<Item = &V> {
-        self.invalidities.iter()
-    }
-
-    /// Count the number of invalidities collected so far
-    ///
-    /// A shortcut for `invalidities().count()` that might be more efficient.
-    #[inline]
-    pub fn count_invalidities(&self) -> usize {
-        self.invalidities.len()
     }
 
     /// Record a new invalidity within this context
@@ -69,6 +55,7 @@ where
         }
     }
 
+    // TODO: Make public?
     fn merge(&mut self, other: Self) {
         self.invalidities.reserve(other.invalidities.len());
         for error in other.invalidities.into_iter() {
@@ -76,6 +63,7 @@ where
         }
     }
 
+    // TODO: Make public?
     #[inline]
     fn merge_result(&mut self, res: Result<V>) {
         if let Err(other) = res {
@@ -83,6 +71,7 @@ where
         }
     }
 
+    // TODO: Make public?
     fn map_and_merge_result<F, U>(&mut self, res: Result<U>, map: F)
     where
         F: Fn(U) -> V,
@@ -140,13 +129,15 @@ where
     }
 }
 
-/// Consume the validation context and transform it into
-/// a sequence of the collected invalidities.
+/// Transform the validation context into an iterator
+/// that yields all the collected invalidities.
 impl<V> IntoIterator for Context<V>
 where
     V: Invalidity,
 {
     type Item = V;
+    // TODO: Replace with an opaque, existantial type eventually (if ever possible):
+    // type IntoIter = impl Iterator<V>;
     type IntoIter = smallvec::IntoIter<SmallVecArray<V>>;
 
     fn into_iter(self) -> Self::IntoIter {
@@ -163,7 +154,7 @@ where
 {
     fn fmt(&self, f: &mut Formatter) -> fmt::Result {
         f.write_str("[")?;
-        for (i, v) in self.invalidities().enumerate() {
+        for (i, v) in self.invalidities.iter().enumerate() {
             if i > 0 {
                 f.write_str(" ")?;
             }
@@ -182,7 +173,7 @@ mod tests {
     fn valid_context() {
         let context = Context::<()>::valid();
         assert!(!context.is_valid());
-        assert_eq!(0, context.count_invalidities());
+        assert!(context.invalidities.is_empty());
         assert!(context.into_result().is_ok());
     }
 
@@ -196,14 +187,13 @@ mod tests {
         let mut context = Context::<()>::valid();
         assert!(!context.is_valid());
         for _ in 0..=SMALLVEC_ARRAY_LEN {
-            let invalidities_before = context.count_invalidities();
+            let invalidities_before = context.invalidities.len();
             context.invalidate(());
             assert!(context.is_valid());
-            let invalidities_after = context.count_invalidities();
+            let invalidities_after = context.invalidities.len();
             assert_eq!(invalidities_after, invalidities_before + 1);
         }
-        assert_eq!(SMALLVEC_ARRAY_LEN + 1, context.count_invalidities());
-        assert_eq!(context.count_invalidities(), context.invalidities().count());
+        assert_eq!(SMALLVEC_ARRAY_LEN + 1, context.invalidities.len());
         assert!(context.into_result().is_err());
     }
 }
