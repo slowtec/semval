@@ -61,8 +61,8 @@ where
 
     /// Conditionally add a new violation to the context
     #[inline]
-    pub fn add_violation_if(&mut self, cond: bool, violation: impl Into<V>) {
-        if cond {
+    pub fn add_violation_if(&mut self, is_violated: bool, violation: impl Into<V>) {
+        if is_violated {
             self.add_violation(violation);
         }
     }
