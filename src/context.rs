@@ -97,13 +97,13 @@ where
         }
     }
 
-    /// Validate the target tand merge the result into this context
+    /// Validate the target and merge the result into this context
     #[inline]
     pub fn validate(&mut self, target: &impl Validate<Validation = V>) {
         self.merge_result(target.validate());
     }
 
-    /// Validate the target tand merge the result after mapping into this context
+    /// Validate the target and merge the result after mapping into this context
     #[inline]
     pub fn validate_and_map<F, U>(&mut self, target: &impl Validate<Validation = U>, map: F) where
         F: Fn(U) -> V,
@@ -112,10 +112,10 @@ where
         self.map_and_merge_result(target.validate(), map);
     }
 
-    /// Finish the current validation with a result
+    /// Finish the current validation of this context with a result
     ///
-    /// Returns `Err` with the context's violations or `Ok` if
-    /// the context does not have any violations.
+    /// Returns the context wrapped into `Err` if it has collected
+    /// one or more violations or `Ok` if the context is valid.
     #[inline]
     pub fn into_result(self) -> Result<V> {
         if self.violations.is_empty() {
@@ -144,6 +144,8 @@ where
     }
 }
 
+/// Consume the validation context and transform it into
+/// a sequence of the collected violations.
 impl<V> IntoIterator for Context<V>
 where
     V: Validation,
