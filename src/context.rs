@@ -105,7 +105,11 @@ where
     }
 
     /// Merge a validation result into the context
+    ///
+    /// TODO: This is supposed to become a non-public function.
+    /// Use use `validate()` instead.
     #[inline]
+    #[deprecated]
     pub fn merge_result(&mut self, res: Result<V>) {
         if let Err(other) = res {
             self.merge_violations(other);
@@ -113,6 +117,10 @@ where
     }
 
     /// Merge an unrelated validation into the context
+    ///
+    /// TODO: This is supposed to become a non-public function.
+    /// Use use `validate_and_map()` instead.
+    #[deprecated]
     pub fn map_and_merge_result<F, U>(&mut self, res: Result<U>, map: F)
     where
         F: Fn(U) -> V,
@@ -124,6 +132,23 @@ where
                 self.violations.push(map(v))
             }
         }
+    }
+
+    /// Validate the target tand merge the result into this context
+    #[inline]
+    pub fn validate(&mut self, target: &impl Validate<Validation = V>) {
+        #[allow(deprecated)]
+        self.merge_result(target.validate());
+    }
+
+    /// Validate the target tand merge the result after mapping into this context
+    #[inline]
+    pub fn validate_and_map<F, U>(&mut self, target: &impl Validate<Validation = U>, map: F) where
+        F: Fn(U) -> V,
+        U: Validation,
+    {
+        #[allow(deprecated)]
+        self.map_and_merge_result(target.validate(), map);
     }
 
     /// Finish the current validation with a result

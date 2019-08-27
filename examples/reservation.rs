@@ -92,10 +92,10 @@ impl Validate for ContactData {
     fn validate(&self) -> ValidationResult<Self::Validation> {
         let mut context = ValidationContext::valid();
         if let Some(ref email) = self.email {
-            context.map_and_merge_result(email.validate(), ContactDataValidation::Email)
+            context.validate_and_map(email, ContactDataValidation::Email)
         }
         if let Some(ref phone) = self.phone {
-            context.map_and_merge_result(phone.validate(), ContactDataValidation::Phone)
+            context.validate_and_map(phone, ContactDataValidation::Phone)
         }
         // Either email or phone must be present
         context.add_violation_if(
@@ -124,8 +124,8 @@ impl Validate for Customer {
     fn validate(&self) -> ValidationResult<Self::Validation> {
         let mut context = ValidationContext::valid();
         context.add_violation_if(self.name.is_empty(), CustomerValidation::NameEmpty);
-        context.map_and_merge_result(
-            self.contact_data.validate(),
+        context.validate_and_map(
+            &self.contact_data,
             CustomerValidation::ContactData,
         );
         context.into()
@@ -179,8 +179,8 @@ impl Validate for Reservation {
 
     fn validate(&self) -> ValidationResult<Self::Validation> {
         let mut context = ValidationContext::valid();
-        context.map_and_merge_result(self.customer.validate(), ReservationValidation::Customer);
-        context.map_and_merge_result(self.quantity.validate(), ReservationValidation::Quantity);
+        context.validate_and_map(&self.customer, ReservationValidation::Customer);
+        context.validate_and_map(&self.quantity, ReservationValidation::Quantity);
         context.into()
     }
 }
