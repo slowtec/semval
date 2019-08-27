@@ -28,6 +28,10 @@ use context::Context;
 use core::{any::Any, fmt::Debug};
 
 /// Result of a validation
+///
+/// The result is ok and empty if the validation succeeded
+/// or otherwise a validation context with one or more
+/// violations.
 pub type Result<V> = core::result::Result<(), Context<V>>;
 
 /// Validation objectives that might be violated

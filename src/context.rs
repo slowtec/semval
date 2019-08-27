@@ -23,35 +23,6 @@ where
     violations: SmallVec<SmallVecArray<V>>,
 }
 
-#[cfg(feature = "std")]
-impl<V> StdError for Context<V> where V: Validation + Display {}
-
-impl<V> Display for Context<V>
-where
-    V: Validation + Display,
-{
-    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        f.write_str("[")?;
-        for (i, v) in self.violations().enumerate() {
-            if i > 0 {
-                f.write_str(" ")?;
-            }
-            write!(f, "{}", v)?;
-        }
-        f.write_str("]")?;
-        Ok(())
-    }
-}
-
-impl<V> Default for Context<V>
-where
-    V: Validation,
-{
-    fn default() -> Self {
-        Self::valid()
-    }
-}
-
 impl<V> Context<V>
 where
     V: Validation,
@@ -64,16 +35,16 @@ where
         }
     }
 
+    /// Check if the context doesn't have any violations
+    #[inline]
+    pub fn is_valid(&self) -> bool {
+        !self.violations.is_empty()
+    }
+
     /// The violations collected so far
     #[inline]
     pub fn violations(&self) -> impl Iterator<Item = &V> {
         self.violations.iter()
-    }
-
-    /// Check if the context already has any violations
-    #[inline]
-    pub fn has_violations(&self) -> bool {
-        !self.violations.is_empty()
     }
 
     /// Count the number of violations collected so far
@@ -97,7 +68,7 @@ where
     }
 
     /// Merge with another context
-    fn merge_violations(&mut self, other: Self) {
+    fn merge(&mut self, other: Self) {
         self.violations.reserve(other.violations.len());
         for error in other.violations.into_iter() {
             self.violations.push(error);
@@ -108,7 +79,7 @@ where
     #[inline]
     fn merge_result(&mut self, res: Result<V>) {
         if let Err(other) = res {
-            self.merge_violations(other);
+            self.merge(other);
         }
     }
 
@@ -155,15 +126,12 @@ where
     }
 }
 
-impl<V> IntoIterator for Context<V>
+impl<V> Default for Context<V>
 where
     V: Validation,
 {
-    type Item = V;
-    type IntoIter = smallvec::IntoIter<SmallVecArray<V>>;
-
-    fn into_iter(self) -> Self::IntoIter {
-        self.violations.into_iter()
+    fn default() -> Self {
+        Self::valid()
     }
 }
 
@@ -176,6 +144,38 @@ where
     }
 }
 
+impl<V> IntoIterator for Context<V>
+where
+    V: Validation,
+{
+    type Item = V;
+    type IntoIter = smallvec::IntoIter<SmallVecArray<V>>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.violations.into_iter()
+    }
+}
+
+#[cfg(feature = "std")]
+impl<V> StdError for Context<V> where V: Validation + Display {}
+
+impl<V> Display for Context<V>
+where
+    V: Validation + Display,
+{
+    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+        f.write_str("[")?;
+        for (i, v) in self.violations().enumerate() {
+            if i > 0 {
+                f.write_str(" ")?;
+            }
+            write!(f, "{}", v)?;
+        }
+        f.write_str("]")?;
+        Ok(())
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -183,7 +183,7 @@ mod tests {
     #[test]
     fn valid_context() {
         let context = Context::<()>::valid();
-        assert!(!context.has_violations());
+        assert!(!context.is_valid());
         assert_eq!(0, context.count_violations());
         assert!(context.into_result().is_ok());
     }
@@ -196,11 +196,11 @@ mod tests {
     #[test]
     fn add_error() {
         let mut context = Context::<()>::valid();
-        assert!(!context.has_violations());
+        assert!(!context.is_valid());
         for _ in 0..=SMALLVEC_ARRAY_LEN {
             let violations_before = context.count_violations();
             context.add_violation(());
-            assert!(context.has_violations());
+            assert!(context.is_valid());
             let violations_after = context.count_violations();
             assert_eq!(violations_after, violations_before + 1);
         }
