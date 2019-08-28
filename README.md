@@ -2,9 +2,9 @@
 
 [![Crates.io](https://img.shields.io/crates/v/semval.svg)](https://crates.io/crates/semval)
 [![Docs.rs](https://docs.rs/semval/badge.svg)](https://docs.rs/semval/)
-[![Dependencies status](https://deps.rs/repo/github/uklotzde/semval/status.svg)](https://deps.rs/repo/github/uklotzde/semval)
-[![Build status](https://travis-ci.org/uklotzde/semval.svg?branch=master)](https://travis-ci.org/uklotzde/semval)
-[![Coverage status](https://coveralls.io/repos/github/uklotzde/semval/badge.svg?branch=master)](https://coveralls.io/github/uklotzde/semval?branch=master)
+[![Dependencies status](https://deps.rs/repo/github/slowtec/semval/status.svg)](https://deps.rs/repo/github/slowtec/semval)
+[![Build status](https://travis-ci.org/slowtec/semval.svg?branch=master)](https://travis-ci.org/slowtec/semval)
+[![Coverage status](https://coveralls.io/repos/github/slowtec/semval/badge.svg?branch=master)](https://coveralls.io/github/slowtec/semval?branch=master)
 [![Apache 2.0 licensed](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](./LICENSE-APACHE)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE-MIT)
 
@@ -18,14 +18,14 @@ Without any macro magic, at least not now.
 
 ## License
 
-Copyright (c) 2019 [Uwe Klotz](https://github.com/uklotzde)
+Copyright (c) 2019 [Uwe Klotz](https://github.com/uklotzde), [slowtec GmbH](https://github.com/slowtec)
 
 Licensed under either of
 
 * Apache License, Version 2.0 ([LICENSE-APACHE](LICENSE-APACHE) or
-  http://www.apache.org/licenses/LICENSE-2.0)
+  https://www.apache.org/licenses/LICENSE-2.0)
 * MIT license ([LICENSE-MIT](LICENSE-MIT) or
-  http://opensource.org/licenses/MIT)
+  https://opensource.org/licenses/MIT)
 
 at your option.
 
