@@ -29,7 +29,7 @@ where
 {
     /// Create a new valid and empty context
     #[inline]
-    pub fn valid() -> Self {
+    pub fn new() -> Self {
         Self {
             invalidities: SmallVec::new(),
         }
@@ -116,7 +116,7 @@ where
     V: Invalidity,
 {
     fn default() -> Self {
-        Self::valid()
+        Self::new()
     }
 }
 
@@ -171,7 +171,7 @@ mod tests {
 
     #[test]
     fn valid_context() {
-        let context = Context::<()>::valid();
+        let context = Context::<()>::new();
         assert!(!context.is_valid());
         assert!(context.invalidities.is_empty());
         assert!(context.into_result().is_ok());
@@ -179,12 +179,12 @@ mod tests {
 
     #[test]
     fn default_context() {
-        assert_eq!(Context::<()>::valid(), Context::<()>::default());
+        assert_eq!(Context::<()>::new(), Context::<()>::default());
     }
 
     #[test]
     fn invalidate() {
-        let mut context = Context::<()>::valid();
+        let mut context = Context::<()>::new();
         assert!(!context.is_valid());
         for _ in 0..=SMALLVEC_ARRAY_LEN {
             let invalidities_before = context.invalidities.len();

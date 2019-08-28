@@ -20,7 +20,7 @@ impl Validate for Email {
     type Invalidity = EmailInvalidity;
 
     fn validate(&self) -> ValidationResult<Self::Invalidity> {
-        let mut context = ValidationContext::valid();
+        let mut context = ValidationContext::new();
         context.invalidate_if(
             self.0.len() < Self::min_len(),
             EmailInvalidity::MinLength,
@@ -51,7 +51,7 @@ impl Validate for Phone {
     type Invalidity = PhoneInvalidity;
 
     fn validate(&self) -> ValidationResult<Self::Invalidity> {
-        let mut context = ValidationContext::valid();
+        let mut context = ValidationContext::new();
         let len = self.0.chars().filter(|c| !c.is_whitespace()).count();
         context.invalidate_if(
             len < Self::min_len(),
@@ -78,7 +78,7 @@ impl Validate for ContactData {
     type Invalidity = ContactDataInvalidity;
 
     fn validate(&self) -> ValidationResult<Self::Invalidity> {
-        let mut context = ValidationContext::valid();
+        let mut context = ValidationContext::new();
         if let Some(ref email) = self.email {
             context.validate_and_map(email, ContactDataInvalidity::Email)
         }
@@ -110,7 +110,7 @@ impl Validate for Customer {
     type Invalidity = CustomerInvalidity;
 
     fn validate(&self) -> ValidationResult<Self::Invalidity> {
-        let mut context = ValidationContext::valid();
+        let mut context = ValidationContext::new();
         context.invalidate_if(self.name.is_empty(), CustomerInvalidity::NameEmpty);
         context.validate_and_map(
             &self.contact_data,
@@ -138,7 +138,7 @@ impl Validate for Quantity {
     type Invalidity = QuantityInvalidity;
 
     fn validate(&self) -> ValidationResult<Self::Invalidity> {
-        let mut context = ValidationContext::valid();
+        let mut context = ValidationContext::new();
         context.invalidate_if(
             *self < Self::min(),
             QuantityInvalidity::MinValue,
@@ -163,7 +163,7 @@ impl Validate for Reservation {
     type Invalidity = ReservationInvalidity;
 
     fn validate(&self) -> ValidationResult<Self::Invalidity> {
-        let mut context = ValidationContext::valid();
+        let mut context = ValidationContext::new();
         context.validate_and_map(&self.customer, ReservationInvalidity::Customer);
         context.validate_and_map(&self.quantity, ReservationInvalidity::Quantity);
         context.into()

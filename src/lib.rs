@@ -71,7 +71,7 @@ mod tests {
         type Invalidity = ();
 
         fn validate(&self) -> Result<Self::Invalidity> {
-            Context::valid().into()
+            Context::new().into()
         }
     }
 
