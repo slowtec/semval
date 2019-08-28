@@ -7,6 +7,7 @@ license = "Apache-2.0 OR MIT"
 readme = "README.md"
 authors = ["Uwe Klotz <uwe.klotz@gmail.com>", "slowtec GmbH <post@slowtec.de>"]
 repository = "https://github.com/slowtec/semval"
+categories = ["no-std"]
 edition = "2018"
 
 [dependencies]
