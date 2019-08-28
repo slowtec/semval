@@ -39,6 +39,12 @@ impl Phone {
     }
 }
 
+impl Phone {
+    pub fn len(&self) -> usize {
+        self.0.chars().filter(|c| !c.is_whitespace()).count()
+    }
+}
+
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 enum PhoneInvalidity {
     MinLength,
@@ -48,10 +54,9 @@ impl Validate for Phone {
     type Invalidity = PhoneInvalidity;
 
     fn validate(&self) -> ValidationResult<Self::Invalidity> {
-        let mut context = ValidationContext::new();
-        let len = self.0.chars().filter(|c| !c.is_whitespace()).count();
-        context = context.invalidate_if(len < Self::min_len(), PhoneInvalidity::MinLength);
-        context.into()
+        ValidationContext::new()
+            .invalidate_if(self.len() < Self::min_len(), PhoneInvalidity::MinLength)
+            .into()
     }
 }
 
@@ -73,6 +78,7 @@ impl Validate for ContactData {
 
     fn validate(&self) -> ValidationResult<Self::Invalidity> {
         let mut context = ValidationContext::new();
+        // Validate all optional members if present
         if let Some(ref email) = self.email {
             context = context.validate_and_map(email, ContactDataInvalidity::Email)
         }
@@ -80,11 +86,12 @@ impl Validate for ContactData {
             context = context.validate_and_map(phone, ContactDataInvalidity::Phone)
         }
         // Either email or phone must be present
-        context = context.invalidate_if(
-            self.email.is_none() && self.phone.is_none(),
-            ContactDataInvalidity::Incomplete,
-        );
-        context.into()
+        context
+            .invalidate_if(
+                self.email.is_none() && self.phone.is_none(),
+                ContactDataInvalidity::Incomplete,
+            )
+            .into()
     }
 }
 
