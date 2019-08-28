@@ -34,7 +34,7 @@ where
     /// Check if the context is still valid
     #[inline]
     pub fn is_valid(&self) -> bool {
-        !self.invalidities.is_empty()
+        self.invalidities.is_empty()
     }
 
     /// Record a new invalidity within this context
@@ -160,7 +160,7 @@ mod tests {
     #[test]
     fn valid_context() {
         let context = Context::<()>::new();
-        assert!(!context.is_valid());
+        assert!(context.is_valid());
         assert!(context.invalidities.is_empty());
         assert!(context.into_result().is_ok());
     }
@@ -173,11 +173,11 @@ mod tests {
     #[test]
     fn invalidate() {
         let mut context = Context::<()>::new();
-        assert!(!context.is_valid());
+        assert!(context.is_valid());
         for _ in 0..=SMALLVEC_ARRAY_LEN {
             let invalidities_before = context.invalidities.len();
             context = context.invalidate(());
-            assert!(context.is_valid());
+            assert!(!context.is_valid());
             let invalidities_after = context.invalidities.len();
             assert_eq!(invalidities_after, invalidities_before + 1);
         }
