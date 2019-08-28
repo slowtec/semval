@@ -20,16 +20,13 @@ impl Validate for Email {
     type Invalidity = EmailInvalidity;
 
     fn validate(&self) -> ValidationResult<Self::Invalidity> {
-        let mut context = ValidationContext::new();
-        context.invalidate_if(
-            self.0.len() < Self::min_len(),
-            EmailInvalidity::MinLength,
-        );
-        context.invalidate_if(
-            self.0.chars().filter(|c| *c == '@').count() != 1,
-            EmailInvalidity::Format,
-        );
-        context.into()
+        ValidationContext::new()
+            .invalidate_if(self.0.len() < Self::min_len(), EmailInvalidity::MinLength)
+            .invalidate_if(
+                self.0.chars().filter(|c| *c == '@').count() != 1,
+                EmailInvalidity::Format,
+            )
+            .into()
     }
 }
 
@@ -53,10 +50,7 @@ impl Validate for Phone {
     fn validate(&self) -> ValidationResult<Self::Invalidity> {
         let mut context = ValidationContext::new();
         let len = self.0.chars().filter(|c| !c.is_whitespace()).count();
-        context.invalidate_if(
-            len < Self::min_len(),
-            PhoneInvalidity::MinLength,
-        );
+        context = context.invalidate_if(len < Self::min_len(), PhoneInvalidity::MinLength);
         context.into()
     }
 }
@@ -80,13 +74,13 @@ impl Validate for ContactData {
     fn validate(&self) -> ValidationResult<Self::Invalidity> {
         let mut context = ValidationContext::new();
         if let Some(ref email) = self.email {
-            context.validate_and_map(email, ContactDataInvalidity::Email)
+            context = context.validate_and_map(email, ContactDataInvalidity::Email)
         }
         if let Some(ref phone) = self.phone {
-            context.validate_and_map(phone, ContactDataInvalidity::Phone)
+            context = context.validate_and_map(phone, ContactDataInvalidity::Phone)
         }
         // Either email or phone must be present
-        context.invalidate_if(
+        context = context.invalidate_if(
             self.email.is_none() && self.phone.is_none(),
             ContactDataInvalidity::Incomplete,
         );
@@ -110,13 +104,10 @@ impl Validate for Customer {
     type Invalidity = CustomerInvalidity;
 
     fn validate(&self) -> ValidationResult<Self::Invalidity> {
-        let mut context = ValidationContext::new();
-        context.invalidate_if(self.name.is_empty(), CustomerInvalidity::NameEmpty);
-        context.validate_and_map(
-            &self.contact_data,
-            CustomerInvalidity::ContactData,
-        );
-        context.into()
+        ValidationContext::new()
+            .invalidate_if(self.name.is_empty(), CustomerInvalidity::NameEmpty)
+            .validate_and_map(&self.contact_data, CustomerInvalidity::ContactData)
+            .into()
     }
 }
 
@@ -138,12 +129,9 @@ impl Validate for Quantity {
     type Invalidity = QuantityInvalidity;
 
     fn validate(&self) -> ValidationResult<Self::Invalidity> {
-        let mut context = ValidationContext::new();
-        context.invalidate_if(
-            *self < Self::min(),
-            QuantityInvalidity::MinValue,
-        );
-        context.into()
+        ValidationContext::new()
+            .invalidate_if(*self < Self::min(), QuantityInvalidity::MinValue)
+            .into()
     }
 }
 
@@ -163,10 +151,10 @@ impl Validate for Reservation {
     type Invalidity = ReservationInvalidity;
 
     fn validate(&self) -> ValidationResult<Self::Invalidity> {
-        let mut context = ValidationContext::new();
-        context.validate_and_map(&self.customer, ReservationInvalidity::Customer);
-        context.validate_and_map(&self.quantity, ReservationInvalidity::Quantity);
-        context.into()
+        ValidationContext::new()
+            .validate_and_map(&self.customer, ReservationInvalidity::Customer)
+            .validate_and_map(&self.quantity, ReservationInvalidity::Quantity)
+            .into()
     }
 }
 

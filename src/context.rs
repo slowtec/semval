@@ -39,36 +39,42 @@ where
 
     /// Record a new invalidity within this context
     #[inline]
-    pub fn invalidate(&mut self, invalidity: impl Into<V>) {
+    pub fn invalidate(mut self, invalidity: impl Into<V>) -> Self {
         self.invalidities.push(invalidity.into());
+        self
     }
 
     /// Conditionally record a new invalidity within this context
     #[inline]
-    pub fn invalidate_if(&mut self, is_violated: bool, invalidity: impl Into<V>) {
+    pub fn invalidate_if(self, is_violated: bool, invalidity: impl Into<V>) -> Self {
         if is_violated {
-            self.invalidate(invalidity);
+            self.invalidate(invalidity)
+        } else {
+            self
         }
     }
 
     // TODO: Make public?
-    fn merge(&mut self, other: Self) {
+    fn merge(mut self, other: Self) -> Self {
         self.invalidities.reserve(other.invalidities.len());
         for error in other.invalidities.into_iter() {
             self.invalidities.push(error);
         }
+        self
     }
 
     /// Merge the results of another validation
     #[inline]
-    pub fn merge_result(&mut self, res: Result<V>) {
+    pub fn merge_result(self, res: Result<V>) -> Self {
         if let Err(other) = res {
-            self.merge(other);
+            self.merge(other)
+        } else {
+            self
         }
     }
 
     /// Merge the mapped results of another validation
-    pub fn map_and_merge_result<F, U>(&mut self, res: Result<U>, map: F)
+    pub fn map_and_merge_result<F, U>(mut self, res: Result<U>, map: F) -> Self
     where
         F: Fn(U) -> V,
         U: Invalidity,
@@ -79,21 +85,23 @@ where
                 self.invalidities.push(map(v))
             }
         }
+        self
     }
 
     /// Validate the target and merge the result into this context
     #[inline]
-    pub fn validate(&mut self, target: &impl Validate<Invalidity = V>) {
-        self.merge_result(target.validate());
+    pub fn validate(self, target: &impl Validate<Invalidity = V>) -> Self {
+        self.merge_result(target.validate())
     }
 
     /// Validate the target, map the result, and merge it into this context
     #[inline]
-    pub fn validate_and_map<F, U>(&mut self, target: &impl Validate<Invalidity = U>, map: F) where
+    pub fn validate_and_map<F, U>(self, target: &impl Validate<Invalidity = U>, map: F) -> Self
+    where
         F: Fn(U) -> V,
         U: Invalidity,
     {
-        self.map_and_merge_result(target.validate(), map);
+        self.map_and_merge_result(target.validate(), map)
     }
 
     /// Finish the current validation of this context with a result
@@ -164,7 +172,7 @@ mod tests {
         assert!(!context.is_valid());
         for _ in 0..=SMALLVEC_ARRAY_LEN {
             let invalidities_before = context.invalidities.len();
-            context.invalidate(());
+            context = context.invalidate(());
             assert!(context.is_valid());
             let invalidities_after = context.invalidities.len();
             assert_eq!(invalidities_after, invalidities_before + 1);

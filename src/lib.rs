@@ -19,7 +19,7 @@ pub mod context;
 /// A proposed set of imports to ease usage of this crate.
 pub mod prelude {
     pub use super::{
-        context::Context as ValidationContext, Result as ValidationResult, Validate, Invalidity,
+        context::Context as ValidationContext, Invalidity, Result as ValidationResult, Validate,
     };
 }
 
