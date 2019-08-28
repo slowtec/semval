@@ -44,6 +44,13 @@ pub type Result<V> = core::result::Result<(), Context<V>>;
 /// (`enum`) with one variant per objective. Some of the variants may
 /// recursively wrap an invalidity of a subordinate validation to trace
 /// back root causes.
+///
+/// Implementations are required to implement `Debug` to enable analysis
+/// and low-level logging of those recursively wrapped sum types.
+///
+/// The trait bound `Any` is implicitly implemented for most types and
+/// enables basic type inspection and downcasting for generically handling
+/// validation results though runtime reflection.
 pub trait Invalidity: Any + Debug {}
 
 impl<V> Invalidity for V where V: Any + Debug {}
