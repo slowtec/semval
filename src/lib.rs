@@ -68,8 +68,11 @@ pub trait Validate {
     fn validate(&self) -> Result<Self::Invalidity>;
 }
 
-/// Apply `Validate` to an option that implicitly evaluates to `Ok`
+/// Validate `Some` or otherwise implicitly evaluate to `Ok`
 /// in case of `None`
+///
+/// If the absence of an optional value is considered a validation
+/// error this must be checked separately.
 impl<V> Validate for Option<V>
 where
     V: Validate,

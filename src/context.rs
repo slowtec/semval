@@ -64,6 +64,8 @@ where
     }
 
     /// Merge the results of another validation
+    ///
+    /// Needed for collecting results from custom validation functions.
     #[inline]
     pub fn merge_result(self, res: Result<V>) -> Self {
         if let Err(other) = res {
@@ -74,6 +76,8 @@ where
     }
 
     /// Merge the mapped results of another validation
+    ///
+    /// Needed for collecting results from custom validation functions.
     pub fn map_and_merge_result<F, U>(mut self, res: Result<U>, map: F) -> Self
     where
         F: Fn(U) -> V,
