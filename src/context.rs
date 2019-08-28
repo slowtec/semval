@@ -1,9 +1,5 @@
 use super::*;
 
-use core::fmt::{self, Display, Formatter};
-
-use std::error::Error as StdError;
-
 use smallvec::SmallVec;
 
 const SMALLVEC_ARRAY_LEN: usize = 8;
@@ -142,26 +138,6 @@ where
 
     fn into_iter(self) -> Self::IntoIter {
         self.invalidities.into_iter()
-    }
-}
-
-#[cfg(feature = "std")]
-impl<V> StdError for Context<V> where V: Invalidity + Display {}
-
-impl<V> Display for Context<V>
-where
-    V: Invalidity + Display,
-{
-    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        f.write_str("[")?;
-        for (i, v) in self.invalidities.iter().enumerate() {
-            if i > 0 {
-                f.write_str(" ")?;
-            }
-            write!(f, "{}", v)?;
-        }
-        f.write_str("]")?;
-        Ok(())
     }
 }
 
