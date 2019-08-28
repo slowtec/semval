@@ -77,17 +77,11 @@ impl Validate for ContactData {
     type Invalidity = ContactDataInvalidity;
 
     fn validate(&self) -> ValidationResult<Self::Invalidity> {
-        let mut context = ValidationContext::new();
-        // Validate all optional members if present
-        if let Some(ref email) = self.email {
-            context = context.validate_and_map(email, ContactDataInvalidity::Email)
-        }
-        if let Some(ref phone) = self.phone {
-            context = context.validate_and_map(phone, ContactDataInvalidity::Phone)
-        }
-        // Either email or phone must be present
-        context
+        ValidationContext::new()
+            .validate_and_map(&self.email, ContactDataInvalidity::Email)
+            .validate_and_map(&self.phone, ContactDataInvalidity::Phone)
             .invalidate_if(
+                // Either email or phone must be present
                 self.email.is_none() && self.phone.is_none(),
                 ContactDataInvalidity::Incomplete,
             )

@@ -68,13 +68,30 @@ pub trait Validate {
     fn validate(&self) -> Result<Self::Invalidity>;
 }
 
+/// Apply `Validate` to an option that implicitly evaluates to `Ok`
+/// in case of `None`
+impl<V> Validate for Option<V>
+where
+    V: Validate,
+{
+    type Invalidity = V::Invalidity;
+
+    fn validate(&self) -> Result<Self::Invalidity> {
+        if let Some(ref some) = self {
+            some.validate()
+        } else {
+            Ok(())
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
 
-    struct Dummy;
+    struct AlwaysValid;
 
-    impl Validate for Dummy {
+    impl Validate for AlwaysValid {
         type Invalidity = ();
 
         fn validate(&self) -> Result<Self::Invalidity> {
@@ -82,8 +99,31 @@ mod tests {
         }
     }
 
+    struct AlwaysInvalid;
+
+    impl Validate for AlwaysInvalid {
+        type Invalidity = ();
+
+        fn validate(&self) -> Result<Self::Invalidity> {
+            Context::new().invalidate(()).into()
+        }
+    }
+
     #[test]
-    fn validate_dummy() {
-        assert!(Dummy.validate().is_ok());
+    fn validate() {
+        assert!(AlwaysValid.validate().is_ok());
+        assert!(AlwaysInvalid.validate().is_err());
+    }
+
+    #[test]
+    fn validate_option_none() {
+        assert!((None as Option<AlwaysValid>).validate().is_ok());
+        assert!((None as Option<AlwaysInvalid>).validate().is_ok());
+    }
+
+    #[test]
+    fn validate_option_some() {
+        assert!(Some(AlwaysValid).validate().is_ok());
+        assert!(Some(AlwaysInvalid).validate().is_err());
     }
 }
