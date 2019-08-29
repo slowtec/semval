@@ -1,9 +1,9 @@
 use semval::prelude::*;
 
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
-struct Email(String);
+struct EmailAddress(String);
 
-impl Email {
+impl EmailAddress {
     const fn min_len() -> usize {
         // a@b.c = 5 chars
         5
@@ -11,65 +11,65 @@ impl Email {
 }
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
-enum EmailInvalidity {
+enum EmailAddressInvalidity {
     MinLength,
     Format,
 }
 
-impl Validate for Email {
-    type Invalidity = EmailInvalidity;
+impl Validate for EmailAddress {
+    type Invalidity = EmailAddressInvalidity;
 
     fn validate(&self) -> ValidationResult<Self::Invalidity> {
         ValidationContext::new()
-            .invalidate_if(self.0.len() < Self::min_len(), EmailInvalidity::MinLength)
+            .invalidate_if(self.0.len() < Self::min_len(), EmailAddressInvalidity::MinLength)
             .invalidate_if(
                 self.0.chars().filter(|c| *c == '@').count() != 1,
-                EmailInvalidity::Format,
+                EmailAddressInvalidity::Format,
             )
             .into()
     }
 }
 
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
-struct Phone(String);
+struct PhoneNumber(String);
 
-impl Phone {
+impl PhoneNumber {
     const fn min_len() -> usize {
         6
     }
 }
 
-impl Phone {
+impl PhoneNumber {
     pub fn len(&self) -> usize {
         self.0.chars().filter(|c| !c.is_whitespace()).count()
     }
 }
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
-enum PhoneInvalidity {
+enum PhoneNumberInvalidity {
     MinLength,
 }
 
-impl Validate for Phone {
-    type Invalidity = PhoneInvalidity;
+impl Validate for PhoneNumber {
+    type Invalidity = PhoneNumberInvalidity;
 
     fn validate(&self) -> ValidationResult<Self::Invalidity> {
         ValidationContext::new()
-            .invalidate_if(self.len() < Self::min_len(), PhoneInvalidity::MinLength)
+            .invalidate_if(self.len() < Self::min_len(), PhoneNumberInvalidity::MinLength)
             .into()
     }
 }
 
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
 struct ContactData {
-    email: Option<Email>,
-    phone: Option<Phone>,
+    email: Option<EmailAddress>,
+    phone: Option<PhoneNumber>,
 }
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 enum ContactDataInvalidity {
-    Phone(PhoneInvalidity),
-    Email(EmailInvalidity),
+    Phone(PhoneNumberInvalidity),
+    Email(EmailAddressInvalidity),
     Incomplete,
 }
 
@@ -163,16 +163,16 @@ fn main() {
     let mut reservation = Reservation::default();
     println!("{:?}: {:?}", reservation, reservation.validate());
 
-    reservation.customer.contact_data.email = Some(Email("a@b@c".to_string()));
+    reservation.customer.contact_data.email = Some(EmailAddress("a@b@c".to_string()));
     println!("{:?}: {:?}", reservation, reservation.validate());
 
     reservation.customer.name = "Mr X".to_string();
-    reservation.customer.contact_data.phone = Some(Phone("0 123".to_string()));
+    reservation.customer.contact_data.phone = Some(PhoneNumber("0 123".to_string()));
     reservation.customer.contact_data.email = None;
     reservation.quantity = Quantity(4);
     println!("{:?}: {:?}", reservation, reservation.validate());
 
     reservation.customer.contact_data.phone = None;
-    reservation.customer.contact_data.email = Some(Email("a@b.c".to_string()));
+    reservation.customer.contact_data.email = Some(EmailAddress("a@b.c".to_string()));
     println!("{:?}: {:?}", reservation, reservation.validate());
 }
