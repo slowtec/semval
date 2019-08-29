@@ -10,9 +10,8 @@
 
 ***Work in progress! Expect braking changes and no changelog until v0.1.0 is released.***
 
-A lightweight and versatile toolbox for semantic validation in Rust.
-
-Please refer to the bundled [*Reservation*](examples/reservation.rs) example to get an idea of how it works.
+A lightweight, non-opinionated, composable micro-framework with minimal dependencies for semantic validation in Rust.
+Please refer to the bundled [*reservation.rs*](examples/reservation.rs) example to get an idea of how it works.
 
 Without any macro magic, at least not now.
 
