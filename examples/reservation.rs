@@ -21,7 +21,10 @@ impl Validate for EmailAddress {
 
     fn validate(&self) -> ValidationResult<Self::Invalidity> {
         ValidationContext::new()
-            .invalidate_if(self.0.len() < Self::min_len(), EmailAddressInvalidity::MinLength)
+            .invalidate_if(
+                self.0.len() < Self::min_len(),
+                EmailAddressInvalidity::MinLength,
+            )
             .invalidate_if(
                 self.0.chars().filter(|c| *c == '@').count() != 1,
                 EmailAddressInvalidity::Format,
@@ -55,7 +58,10 @@ impl Validate for PhoneNumber {
 
     fn validate(&self) -> ValidationResult<Self::Invalidity> {
         ValidationContext::new()
-            .invalidate_if(self.len() < Self::min_len(), PhoneNumberInvalidity::MinLength)
+            .invalidate_if(
+                self.len() < Self::min_len(),
+                PhoneNumberInvalidity::MinLength,
+            )
             .into()
     }
 }
