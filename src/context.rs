@@ -94,8 +94,11 @@ where
 
     /// Validate the target and merge the result into this context
     #[inline]
-    pub fn validate(self, target: &impl Validate<Invalidity = V>) -> Self {
-        self.merge_result(target.validate())
+    pub fn validate<U>(self, target: &impl Validate<Invalidity = U>) -> Self
+    where
+        U: Invalidity + Into<V>,
+    {
+        self.map_and_merge_result(target.validate(), |u| u.into())
     }
 
     /// Validate the target, map the result, and merge it into this context
