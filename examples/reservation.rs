@@ -1,6 +1,6 @@
 use semval::prelude::*;
 
-#[derive(Clone, Debug, Default, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 struct EmailAddress(String);
 
 impl EmailAddress {
@@ -33,7 +33,7 @@ impl Validate for EmailAddress {
     }
 }
 
-#[derive(Clone, Debug, Default, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 struct PhoneNumber(String);
 
 impl PhoneNumber {
@@ -118,12 +118,16 @@ impl Validate for Customer {
     }
 }
 
-#[derive(Copy, Clone, Debug, Default, Eq, PartialEq, Ord, PartialOrd)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq, Ord, PartialOrd)]
 struct Quantity(usize);
 
 impl Quantity {
     const fn min() -> Self {
         Self(1)
+    }
+
+    fn new(value: usize) -> Self {
+        Self(value)
     }
 }
 
@@ -142,7 +146,7 @@ impl Validate for Quantity {
     }
 }
 
-#[derive(Clone, Debug, Default, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq)]
 struct Reservation {
     customer: Customer,
     quantity: Quantity,
@@ -166,7 +170,10 @@ impl Validate for Reservation {
 }
 
 fn main() {
-    let mut reservation = Reservation::default();
+    let mut reservation = Reservation {
+        customer: Default::default(),
+        quantity: Quantity::new(0),
+    };
     println!("{:?}: {:?}", reservation, reservation.validate());
 
     reservation.customer.contact_data.email = Some(EmailAddress("a@b@c".to_string()));
