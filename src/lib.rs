@@ -19,7 +19,8 @@ pub mod context;
 /// A proposed set of imports to ease usage of this crate.
 pub mod prelude {
     pub use super::{
-        context::Context as ValidationContext, Invalidity, Result as ValidationResult, Validate,
+        context::Context as ValidationContext, IntoValidated, Invalidity,
+        Result as ValidationResult, Validate, ValidatedFrom, ValidatedResult,
     };
 }
 
@@ -28,7 +29,7 @@ mod util;
 
 use self::{context::Context, util::*};
 
-use core::{any::Any, fmt::Debug};
+use core::{any::Any, fmt::Debug, result::Result as CoreResult};
 
 /// Result of a validation
 ///
@@ -91,6 +92,63 @@ where
     }
 }
 
+/// Result of a value-to-value conversion with post-validation of the output value
+pub type ValidatedResult<V> = CoreResult<V, (V, Context<<V as Validate>::Invalidity>)>;
+
+/// Value-to-value conversion with post-validation of the output value
+///
+/// On success the output value is returned. On validation errors the output
+/// value is returned together with all invalidities.
+///
+/// If validation of the output value has failed clients
+///  - may discard the output and abort,
+///  - are able to handle or fix the validation errors and continue, or
+///  - accept the output despite validation errors and continue.
+///
+/// The initial value-to-value conversion from input to output must always succeed.
+///
+/// The validation is performed on the output value after the input value has
+/// been consumed during the conversion. This *post-validation* approach should
+/// be applicable and sufficient for most use cases. It simplifies the validated
+/// result type by always returning the converted output independent of whether
+/// the validation succeeded or failed.
+pub trait ValidatedFrom<T>: Validate + Sized {
+    /// Convert input value into `Self` and validate `self`
+    fn validated_from(from: T) -> ValidatedResult<Self>;
+}
+
+impl<T> ValidatedFrom<T> for T
+where
+    T: Validate,
+{
+    fn validated_from(from: T) -> ValidatedResult<Self> {
+        if let Err(err) = from.validate() {
+            Err((from, err))
+        } else {
+            Ok(from)
+        }
+    }
+}
+
+/// Value-to-value conversion with post-validation of the output value
+///
+/// Prefer to implement [ValidatedFrom](trait.ValidatedFrom.html) for types inside
+/// the current crate. All types that implement [ValidatedFrom](trait.ValidatedFrom.html)
+/// implicitly implement this trait.
+pub trait IntoValidated<V: Validate> {
+    /// Convert `self` into output value and validate the output
+    fn into_validated(self) -> ValidatedResult<V>;
+}
+
+impl<T, V> IntoValidated<V> for T
+where
+    V: ValidatedFrom<T>,
+{
+    fn into_validated(self) -> ValidatedResult<V> {
+        V::validated_from(self)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -131,5 +189,17 @@ mod tests {
     fn validate_option_some() {
         assert!(Some(AlwaysValid).validate().is_ok());
         assert!(Some(AlwaysInvalid).validate().is_err());
+    }
+
+    #[test]
+    fn validated_from() {
+        assert!(AlwaysValid::validated_from(AlwaysValid).is_ok());
+        assert!(AlwaysInvalid::validated_from(AlwaysInvalid).is_err());
+    }
+
+    #[test]
+    fn into_validated() {
+        assert!(IntoValidated::<AlwaysValid>::into_validated(AlwaysValid).is_ok());
+        assert!(IntoValidated::<AlwaysInvalid>::into_validated(AlwaysInvalid).is_err());
     }
 }

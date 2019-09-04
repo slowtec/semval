@@ -177,6 +177,32 @@ impl Validate for Reservation {
     }
 }
 
+struct NewReservation(Reservation);
+
+impl ValidatedFrom<NewReservation> for Reservation {
+    fn validated_from(from: NewReservation) -> ValidatedResult<Reservation> {
+        let into = from.0;
+        if let Err(context) = into.validate() {
+            Err((into, context))
+        } else {
+            Ok(into)
+        }
+    }
+}
+
+fn new_reservation_with_quantity(quantity: Quantity) -> NewReservation {
+    NewReservation(Reservation {
+        customer: Customer {
+            name: "Mr X".to_string(),
+            contact_data: ContactData {
+                email: Some(EmailAddress("mr_x@example.com".to_string())),
+                ..Default::default()
+            },
+        },
+        quantity,
+    })
+}
+
 fn main() {
     let mut reservation = Reservation {
         customer: Default::default(),
@@ -196,4 +222,20 @@ fn main() {
     reservation.customer.contact_data.phone = None;
     reservation.customer.contact_data.email = Some(EmailAddress("a@b.c".to_string()));
     println!("{:?}: {:?}", reservation, reservation.validate());
+
+    // Type-safe conversion and validation of input data
+    for quantity in &[Quantity::new(1), Quantity::new(0)] {
+        let new_reservation = new_reservation_with_quantity(*quantity);
+        match Reservation::validated_from(new_reservation) {
+            Ok(valid_reservation) => {
+                println!("Received a valid reservation {:?}", valid_reservation);
+            }
+            Err((invalid_reservation, context)) => {
+                println!(
+                    "Received an invalid reservation {:?}: {:?}",
+                    invalid_reservation, context
+                );
+            }
+        }
+    }
 }

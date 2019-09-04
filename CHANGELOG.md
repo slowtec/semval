@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added traits `ValidatedFrom` and `IntoValidated` for type-save validation
+
 ### Changed
 
 - Generalize `validate()` for all `Invalidity` types that implement `Into`
