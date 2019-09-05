@@ -98,7 +98,7 @@ where
     where
         U: Invalidity + Into<V>,
     {
-        self.map_and_merge_result(target.validate(), |u| u.into())
+        self.validate_and_map(target, Into::into)
     }
 
     /// Validate the target, map the result, and merge it into this context
