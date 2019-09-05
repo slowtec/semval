@@ -107,13 +107,21 @@ enum CustomerInvalidity {
     ContactData(ContactDataInvalidity),
 }
 
+// This conversion allows to use ValidationContext::validate()
+// instead of ValidationContext::validate_and_map().
+impl From<ContactDataInvalidity> for CustomerInvalidity {
+    fn from(from: ContactDataInvalidity) -> Self {
+        CustomerInvalidity::ContactData(from)
+    }
+}
+
 impl Validate for Customer {
     type Invalidity = CustomerInvalidity;
 
     fn validate(&self) -> ValidationResult<Self::Invalidity> {
         ValidationContext::new()
             .invalidate_if(self.name.is_empty(), CustomerInvalidity::NameEmpty)
-            .validate_and_map(&self.contact_data, CustomerInvalidity::ContactData)
+            .validate(&self.contact_data)
             .into()
     }
 }
