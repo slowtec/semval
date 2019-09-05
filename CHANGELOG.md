@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Generalize `validate()` for all `Invalidity` types that implement `Into`
+
 ### Removed
 
 ## [0.1.0] - 2019-09-03
