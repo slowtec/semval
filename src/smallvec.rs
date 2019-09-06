@@ -44,13 +44,13 @@ where
         this
     }
 
-    fn merge_from_iter<H, I>(mut self, reserve_hint: H, from_iter: I) -> Self
+    fn merge_iter<H, I>(mut self, count_hint: H, iter: I) -> Self
     where
         H: Into<Option<usize>>,
         I: Iterator<Item = Self::Item>,
     {
-        self.reserve(reserve_hint.into().unwrap_or(0));
-        self.insert_many(self.len(), from_iter);
+        self.reserve(count_hint.into().unwrap_or(0));
+        self.insert_many(self.len(), iter);
         self
     }
 }

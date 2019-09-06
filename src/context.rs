@@ -49,12 +49,12 @@ where
         self
     }
 
-    fn merge_from_iter<H, I>(mut self, reserve_hint: H, from_iter: I) -> Self
+    fn merge_iter<H, I>(mut self, count_hint: H, iter: I) -> Self
     where
         H: Into<Option<usize>>,
         I: Iterator<Item = Self::Item>,
     {
-        self.invalidities = self.invalidities.merge_from_iter(reserve_hint, from_iter);
+        self.invalidities = self.invalidities.merge_iter(count_hint, iter);
         self
     }
 }
@@ -78,7 +78,7 @@ where
     /// Record a new invalidity within this context
     #[inline]
     pub fn invalidate(self, invalidity: impl Into<V>) -> Self {
-        self.merge_from_iter(1, once(invalidity.into()))
+        self.merge_iter(1, once(invalidity.into()))
     }
 
     /// Conditionally record a new invalidity within this context
@@ -112,7 +112,7 @@ where
         U: Invalidity,
     {
         if let Err(other) = res {
-            self.merge_from_iter(
+            self.merge_iter(
                 other.invalidities.len(),
                 other.invalidities.into_iter().map(map),
             )
