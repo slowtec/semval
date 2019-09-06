@@ -62,9 +62,7 @@ where
     /// Create a new valid and empty context
     #[inline]
     pub fn new() -> Self {
-        Self {
-            invalidities: Default::default(),
-        }
+        Self::empty(<SmallVecArray<V> as smallvec::Array>::size())
     }
 
     /// Check if the context is still valid
@@ -141,7 +139,7 @@ where
     /// Finish the current validation of this context with a result
     #[inline]
     pub fn into_result(self) -> Result<V> {
-        if self.invalidities.is_empty() {
+        if self.is_valid() {
             Ok(())
         } else {
             Err(self)

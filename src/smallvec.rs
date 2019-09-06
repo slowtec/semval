@@ -2,7 +2,7 @@
 use crate::util::*;
 
 /// Re-exports
-pub(crate) use smallvec::{IntoIter, SmallVec};
+pub(crate) use smallvec::{Array, IntoIter, SmallVec};
 
 impl<A> IsEmpty for smallvec::SmallVec<A>
 where
