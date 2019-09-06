@@ -1,63 +1,12 @@
 use super::*;
 
-use smallvec::SmallVec;
+use crate::smallvec::*;
 
-trait IsEmpty {
-    fn is_empty(&self) -> bool;
-}
-
-trait Mergeable {
-    type Item;
-
-    fn merge(self, other: Self) -> Self;
-
-    fn merge_item(self, item: Self::Item) -> Self;
-
-    fn merge_from<I, M>(self, reserve: usize, from_iter: I, map_into: M) -> Self
-    where
-        I: Iterator,
-        M: Fn(<I as Iterator>::Item) -> Self::Item;
-}
+use core::{convert::identity, iter::once};
 
 const SMALLVEC_ARRAY_LEN: usize = 8;
 
 type SmallVecArray<V> = [V; SMALLVEC_ARRAY_LEN];
-
-impl<V> IsEmpty for SmallVec<SmallVecArray<V>> {
-    fn is_empty(&self) -> bool {
-        self.is_empty()
-    }
-}
-
-impl<V> Mergeable for SmallVec<SmallVecArray<V>> {
-    type Item = V;
-
-    fn merge(self, other: Self) -> Self {
-        let (source, mut sink) = if self.capacity() < other.capacity() {
-            (self, other)
-        } else {
-            (other, self)
-        };
-        sink.reserve(source.len());
-        sink.insert_many(sink.len(), source.into_iter());
-        sink
-    }
-
-    fn merge_item(mut self, item: Self::Item) -> Self {
-        self.push(item);
-        self
-    }
-
-    fn merge_from<I, M>(mut self, reserve: usize, from_iter: I, map_from: M) -> Self
-    where
-        I: Iterator,
-        M: Fn(<I as Iterator>::Item) -> Self::Item,
-    {
-        self.reserve(reserve);
-        self.insert_many(self.len(), from_iter.map(map_from));
-        self
-    }
-}
 
 /// A collection of invalidities resulting from a validation
 ///
@@ -93,7 +42,9 @@ where
     /// Record a new invalidity within this context
     #[inline]
     pub fn invalidate(mut self, invalidity: impl Into<V>) -> Self {
-        self.invalidities = self.invalidities.merge_item(invalidity.into());
+        self.invalidities = self
+            .invalidities
+            .merge_from_iter(1, once(invalidity.into()), identity);
         self
     }
 
@@ -134,7 +85,7 @@ where
         U: Invalidity,
     {
         if let Err(other) = res {
-            self.invalidities = self.invalidities.merge_from(
+            self.invalidities = self.invalidities.merge_from_iter(
                 other.invalidities.len(),
                 other.invalidities.into_iter(),
                 map,

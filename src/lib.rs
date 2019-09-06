@@ -23,7 +23,10 @@ pub mod prelude {
     };
 }
 
-use context::Context;
+mod smallvec;
+mod util;
+
+use self::{context::Context, util::*};
 
 use core::{any::Any, fmt::Debug};
 
@@ -35,7 +38,7 @@ use core::{any::Any, fmt::Debug};
 ///
 /// In contrast to common results the actual payload is carried by
 /// the error variant while a successful result is just the unit type.
-pub type Result<V> = core::result::Result<(), Context<V>>;
+pub type Result<V> = UnitResult<Context<V>>;
 
 /// Invalidities that cause validation failures
 ///
