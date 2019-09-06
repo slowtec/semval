@@ -56,9 +56,7 @@ where
         I: Iterator,
         M: Fn(<I as Iterator>::Item) -> Self::Item,
     {
-        self.invalidities.reserve(reserve);
-        self.invalidities
-            .insert_many(self.invalidities.len(), from_iter.map(map_from));
+        self.invalidities = self.invalidities.merge_from_iter(reserve, from_iter, map_from);
         self
     }
 }
