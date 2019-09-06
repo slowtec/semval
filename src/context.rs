@@ -12,13 +12,22 @@ type SmallVecArray<V> = [V; SMALLVEC_ARRAY_LEN];
 ///
 /// Collects invalidities that are detected while performing
 /// a validation.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 #[cfg_attr(test, derive(Eq, PartialEq))]
 pub struct Context<V>
 where
     V: Invalidity,
 {
     invalidities: SmallVec<SmallVecArray<V>>,
+}
+
+impl<V> IsEmpty for Context<V>
+where
+    V: Invalidity,
+{
+    fn is_empty(&self) -> bool {
+        self.invalidities.is_empty()
+    }
 }
 
 impl<V> Mergeable for Context<V>
@@ -62,7 +71,7 @@ where
     #[inline]
     pub fn new() -> Self {
         Self {
-            invalidities: SmallVec::new(),
+            invalidities: Default::default(),
         }
     }
 
@@ -146,15 +155,6 @@ where
         } else {
             Err(self)
         }
-    }
-}
-
-impl<V> Default for Context<V>
-where
-    V: Invalidity,
-{
-    fn default() -> Self {
-        Self::new()
     }
 }
 
