@@ -32,16 +32,16 @@ where
     }
 
     fn merge(self, other: Self) -> Self {
-        // Reuse the instance with greater capacity for accumulation (sink)
-        // and consume (= drain & drop) the other one (source).
-        let (source, mut sink) = if self.capacity() < other.capacity() {
+        // Reuse the instance with greater capacity for accumulation (this)
+        // and consume (= drain & drop) the other one (that).
+        let (that, mut this) = if self.capacity() < other.capacity() {
             (self, other)
         } else {
             (other, self)
         };
-        sink.reserve(source.len());
-        sink.insert_many(sink.len(), source.into_iter());
-        sink
+        this.reserve(that.len());
+        this.insert_many(this.len(), that.into_iter());
+        this
     }
 
     fn merge_from_iter<H, I>(mut self, reserve_hint: H, from_iter: I) -> Self
