@@ -2,7 +2,7 @@ use super::*;
 
 use crate::smallvec::*;
 
-use core::{convert::identity, iter::once};
+use core::iter::once;
 
 const SMALLVEC_ARRAY_LEN: usize = 8;
 
@@ -36,27 +36,21 @@ where
 {
     type Item = V;
 
+    fn empty(capacity: usize) -> Self {
+        let invalidities = Mergeable::empty(capacity);
+        Self { invalidities }
+    }
+
     fn merge(mut self, other: Self) -> Self {
         self.invalidities = self.invalidities.merge(other.invalidities);
         self
     }
 
-    fn from_iter<I, M>(reserve: usize, from_iter: I, map_from: M) -> Self
+    fn merge_from_iter<I>(mut self, reserve: usize, from_iter: I) -> Self
     where
-        I: Iterator,
-        M: Fn(<I as Iterator>::Item) -> Self::Item,
+        I: Iterator<Item = Self::Item>,
     {
-        let mut invalidities = SmallVec::with_capacity(reserve);
-        invalidities.insert_many(invalidities.len(), from_iter.map(map_from));
-        Self { invalidities }
-    }
-
-    fn merge_from_iter<I, M>(mut self, reserve: usize, from_iter: I, map_from: M) -> Self
-    where
-        I: Iterator,
-        M: Fn(<I as Iterator>::Item) -> Self::Item,
-    {
-        self.invalidities = self.invalidities.merge_from_iter(reserve, from_iter, map_from);
+        self.invalidities = self.invalidities.merge_from_iter(reserve, from_iter);
         self
     }
 }
@@ -82,7 +76,7 @@ where
     /// Record a new invalidity within this context
     #[inline]
     pub fn invalidate(self, invalidity: impl Into<V>) -> Self {
-        self.merge_from_iter(1, once(invalidity.into()), identity)
+        self.merge_from_iter(1, once(invalidity.into()))
     }
 
     /// Conditionally record a new invalidity within this context
@@ -118,8 +112,7 @@ where
         if let Err(other) = res {
             self.merge_from_iter(
                 other.invalidities.len(),
-                other.invalidities.into_iter(),
-                map,
+                other.invalidities.into_iter().map(map),
             )
         } else {
             self
