@@ -36,8 +36,11 @@ where
 {
     type Item = V;
 
-    fn empty(capacity: usize) -> Self {
-        let invalidities = Mergeable::empty(capacity);
+    fn empty<H>(capacity_hint: H) -> Self
+    where
+        H: Into<Option<usize>>,
+    {
+        let invalidities = Mergeable::empty(capacity_hint);
         Self { invalidities }
     }
 
@@ -46,11 +49,12 @@ where
         self
     }
 
-    fn merge_from_iter<I>(mut self, reserve: usize, from_iter: I) -> Self
+    fn merge_from_iter<H, I>(mut self, reserve_hint: H, from_iter: I) -> Self
     where
+        H: Into<Option<usize>>,
         I: Iterator<Item = Self::Item>,
     {
-        self.invalidities = self.invalidities.merge_from_iter(reserve, from_iter);
+        self.invalidities = self.invalidities.merge_from_iter(reserve_hint, from_iter);
         self
     }
 }

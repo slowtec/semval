@@ -19,7 +19,11 @@ where
 {
     type Item = A::Item;
 
-    fn empty(capacity: usize) -> Self {
+    fn empty<H>(capacity_hint: H) -> Self
+    where
+        H: Into<Option<usize>>,
+    {
+        let capacity = capacity_hint.into().unwrap_or(0);
         if capacity > 0 {
             Self::with_capacity(capacity)
         } else {
@@ -40,11 +44,12 @@ where
         sink
     }
 
-    fn merge_from_iter<I>(mut self, reserve: usize, from_iter: I) -> Self
+    fn merge_from_iter<H, I>(mut self, reserve_hint: H, from_iter: I) -> Self
     where
+        H: Into<Option<usize>>,
         I: Iterator<Item = Self::Item>,
     {
-        self.reserve(reserve);
+        self.reserve(reserve_hint.into().unwrap_or(0));
         self.insert_many(self.len(), from_iter);
         self
     }
