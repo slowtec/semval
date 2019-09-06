@@ -96,3 +96,58 @@ where
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    impl IsEmpty for usize {
+        fn is_empty(&self) -> bool {
+            *self == 0
+        }
+    }
+
+    impl Mergeable for usize {
+        type Item = usize;
+
+        fn merge(self, other: Self) -> Self {
+            self + other
+        }
+
+        fn from_iter<I, M>(_: usize, from_iter: I, map_from: M) -> Self
+        where
+            I: Iterator,
+            M: Fn(<I as Iterator>::Item) -> Self::Item,
+        {
+            from_iter.fold(0, |sum, item| sum + map_from(item))
+        }
+
+        fn merge_from_iter<I, M>(self, _: usize, from_iter: I, map_from: M) -> Self
+        where
+            I: Iterator,
+            M: Fn(<I as Iterator>::Item) -> Self::Item,
+        {
+            from_iter.fold(self, |sum, item| sum + map_from(item))
+        }
+    }
+
+    #[test]
+    fn unit_is_empty() {
+        assert!(().is_empty())
+    }
+
+    #[test]
+    fn unit_mergeable() {
+        assert_eq!((), ().merge(()));
+        assert_eq!((), <() as Mergeable>::from_iter(3, core::iter::repeat(()).take(3), core::convert::identity));
+        assert_eq!((), ().merge_from_iter(3, core::iter::repeat(()).take(3), core::convert::identity));
+    }
+
+    #[test]
+    fn unit_result() {
+        assert_eq!(Ok(()) as UnitResult<usize>, Ok(()).merge(Ok(())));
+        assert_eq!(Err(1usize), Err(1).merge(Ok(())));
+        assert_eq!(Err(2usize), Ok(()).merge(Err(2)));
+        assert_eq!(Err(3usize), Err(1).merge(Err(2)));
+    }
+}
