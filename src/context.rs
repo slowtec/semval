@@ -21,6 +21,39 @@ where
     invalidities: SmallVec<SmallVecArray<V>>,
 }
 
+impl<V> Mergeable for Context<V>
+where
+    V: Invalidity,
+{
+    type Item = V;
+
+    fn merge(mut self, other: Self) -> Self {
+        self.invalidities = self.invalidities.merge(other.invalidities);
+        self
+    }
+
+    fn from_iter<I, M>(reserve: usize, from_iter: I, map_from: M) -> Self
+    where
+        I: Iterator,
+        M: Fn(<I as Iterator>::Item) -> Self::Item,
+    {
+        let mut invalidities = SmallVec::with_capacity(reserve);
+        invalidities.insert_many(invalidities.len(), from_iter.map(map_from));
+        Self { invalidities }
+    }
+
+    fn merge_from_iter<I, M>(mut self, reserve: usize, from_iter: I, map_from: M) -> Self
+    where
+        I: Iterator,
+        M: Fn(<I as Iterator>::Item) -> Self::Item,
+    {
+        self.invalidities.reserve(reserve);
+        self.invalidities
+            .insert_many(self.invalidities.len(), from_iter.map(map_from));
+        self
+    }
+}
+
 impl<V> Context<V>
 where
     V: Invalidity,
@@ -36,16 +69,13 @@ where
     /// Check if the context is still valid
     #[inline]
     pub fn is_valid(&self) -> bool {
-        self.invalidities.is_empty()
+        self.is_empty()
     }
 
     /// Record a new invalidity within this context
     #[inline]
-    pub fn invalidate(mut self, invalidity: impl Into<V>) -> Self {
-        self.invalidities = self
-            .invalidities
-            .merge_from_iter(1, once(invalidity.into()), identity);
-        self
+    pub fn invalidate(self, invalidity: impl Into<V>) -> Self {
+        self.merge_from_iter(1, once(invalidity.into()), identity)
     }
 
     /// Conditionally record a new invalidity within this context
@@ -56,12 +86,6 @@ where
         } else {
             self
         }
-    }
-
-    // TODO: Make public?
-    fn merge(mut self, other: Self) -> Self {
-        self.invalidities = self.invalidities.merge(other.invalidities);
-        self
     }
 
     /// Merge the results of another validation
@@ -79,19 +103,20 @@ where
     /// Merge the mapped results of another validation
     ///
     /// Needed for collecting results from custom validation functions.
-    pub fn map_and_merge_result<F, U>(mut self, res: Result<U>, map: F) -> Self
+    pub fn map_and_merge_result<F, U>(self, res: Result<U>, map: F) -> Self
     where
         F: Fn(U) -> V,
         U: Invalidity,
     {
         if let Err(other) = res {
-            self.invalidities = self.invalidities.merge_from_iter(
+            self.merge_from_iter(
                 other.invalidities.len(),
                 other.invalidities.into_iter(),
                 map,
-            );
+            )
+        } else {
+            self
         }
-        self
     }
 
     /// Validate the target and merge the result into this context
@@ -165,8 +190,8 @@ mod tests {
     #[test]
     fn valid_context() {
         let context = Context::<()>::new();
+        assert!(context.is_empty());
         assert!(context.is_valid());
-        assert!(context.invalidities.is_empty());
         assert!(context.into_result().is_ok());
     }
 
@@ -178,10 +203,12 @@ mod tests {
     #[test]
     fn invalidate() {
         let mut context = Context::<()>::new();
+        assert!(context.is_empty());
         assert!(context.is_valid());
         for _ in 0..=SMALLVEC_ARRAY_LEN {
             let invalidities_before = context.invalidities.len();
             context = context.invalidate(());
+            assert!(!context.is_empty());
             assert!(!context.is_valid());
             let invalidities_after = context.invalidities.len();
             assert_eq!(invalidities_after, invalidities_before + 1);

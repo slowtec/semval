@@ -1,5 +1,4 @@
 /// Trait implementations for smallvec types
-
 use crate::util::*;
 
 /// Re-exports
@@ -21,6 +20,8 @@ where
     type Item = A::Item;
 
     fn merge(self, other: Self) -> Self {
+        // Reuse the instance with greater capacity for accumulation (sink)
+        // and consume (= drain & drop) the other one (source).
         let (source, mut sink) = if self.capacity() < other.capacity() {
             (self, other)
         } else {
