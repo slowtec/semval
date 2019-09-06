@@ -146,4 +146,70 @@ mod tests {
         assert_eq!(Err(2usize), Ok(()).merge(Err(2)));
         assert_eq!(Err(3usize), Err(1).merge(Err(2)));
     }
+
+    #[cfg(feature = "std")]
+    impl<T> IsEmpty for Vec<T> {
+        fn is_empty(&self) -> bool {
+            self.is_empty()
+        }
+    }
+
+    #[cfg(feature = "std")]
+    #[test]
+    fn vec_is_empty() {
+        assert!(<Vec<()> as IsEmpty>::is_empty(&vec![]));
+    }
+
+    #[cfg(feature = "std")]
+    impl<T> Mergeable for Vec<T> {
+        type Item = T;
+
+        fn empty<H>(capacity_hint: H) -> Self
+        where
+            H: Into<Option<usize>>,
+        {
+            let capacity = capacity_hint.into().unwrap_or(0);
+            if capacity > 0 {
+                Self::with_capacity(capacity)
+            } else {
+                Default::default()
+            }
+        }
+
+        fn merge(self, other: Self) -> Self {
+            // Reuse the instance with greater capacity for accumulation (this)
+            // and consume (= drain & drop) the other one (that).
+            let (mut that, mut this) = if self.capacity() < other.capacity() {
+                (self, other)
+            } else {
+                (other, self)
+            };
+            this.append(&mut that);
+            this
+        }
+
+        fn merge_from_iter<H, I>(mut self, reserve_hint: H, from_iter: I) -> Self
+        where
+            H: Into<Option<usize>>,
+            I: Iterator<Item = Self::Item>,
+        {
+            self.reserve(reserve_hint.into().unwrap_or(0));
+            from_iter.fold(self, |mut this, item| {
+                this.push(item);
+                this
+            })
+        }
+    }
+
+    #[cfg(feature = "std")]
+    #[test]
+    fn vec_mergeable() {
+        assert!(<Vec<()> as Mergeable>::empty(None).is_empty());
+        assert!(<Vec<()> as Mergeable>::empty(5).is_empty());
+        assert_eq!(vec![1, 2], vec![].merge(vec![1, 2]));
+        assert_eq!(vec![1, 2], vec![1, 2].merge(vec![]));
+        assert_eq!(vec![2, 1], vec![2].merge(vec![1]));
+        assert_eq!(vec![2, 3, 1, 4], vec![2, 3].merge(vec![1, 4]));
+        assert_eq!(vec![0, 2, 3, 1, 4], vec![0].merge_from_iter(4, vec![2, 3, 1, 4].into_iter()));
+    }
 }
