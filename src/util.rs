@@ -56,6 +56,14 @@ pub(crate) trait Mergeable {
         I: Iterator<Item = Self::Item>;
 }
 
+pub(crate) trait MergeableSized: Mergeable + Sized {
+    fn merge_exact_size_iter<I>(self, iter: I) -> Self
+    where
+        I: ExactSizeIterator<Item = Self::Item> {
+        self.merge_iter(iter.len(), iter)
+    }
+}
+
 /// Trivial implementation of `Mergeable` for the unit type `()`
 impl Mergeable for () {
     type Item = ();
@@ -213,6 +221,9 @@ mod tests {
         assert_eq!(vec![1, 2], vec![1, 2].merge(vec![]));
         assert_eq!(vec![2, 1], vec![2].merge(vec![1]));
         assert_eq!(vec![2, 3, 1, 4], vec![2, 3].merge(vec![1, 4]));
-        assert_eq!(vec![0, 2, 3, 1, 4], vec![0].merge_iter(4, vec![2, 3, 1, 4].into_iter()));
+        assert_eq!(
+            vec![0, 2, 3, 1, 4],
+            vec![0].merge_iter(4, vec![2, 3, 1, 4].into_iter())
+        );
     }
 }

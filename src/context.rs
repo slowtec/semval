@@ -59,6 +59,12 @@ where
     }
 }
 
+impl<V> MergeableSized for Context<V>
+where
+    V: Invalidity,
+{
+}
+
 impl<V> Context<V>
 where
     V: Invalidity,
@@ -112,10 +118,7 @@ where
         U: Invalidity,
     {
         if let Err(other) = res {
-            self.merge_iter(
-                other.invalidities.len(),
-                other.invalidities.into_iter().map(map),
-            )
+            self.merge_exact_size_iter(other.invalidities.into_iter().map(map))
         } else {
             self
         }
@@ -167,7 +170,7 @@ where
     V: Invalidity,
 {
     type Item = V;
-    // TODO: Replace with an opaque, existantial type eventually (if ever possible):
+    // TODO: Replace with an opaque, existential type eventually (if ever possible):
     // type IntoIter = impl Iterator<V>;
     type IntoIter = smallvec::IntoIter<SmallVecArray<V>>;
 
