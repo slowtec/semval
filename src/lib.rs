@@ -112,6 +112,58 @@ pub type ValidatedResult<V> = CoreResult<V, (V, Context<<V as Validate>::Invalid
 /// be applicable and sufficient for most use cases. It simplifies the validated
 /// result type by always returning the converted output independent of whether
 /// the validation succeeded or failed.
+///
+/// # Example
+/// ```
+/// # use semval::prelude::*;
+///
+/// struct UnvalidatedEmail(String);
+///
+/// struct Email(String);
+///
+/// #[derive(Debug)]
+/// enum EmailInvalidity {
+///     MinLength,
+///     Format,
+/// }
+///
+/// impl Validate for Email {
+///     type Invalidity = EmailInvalidity;
+/// #
+///     fn validate(&self) -> ValidationResult<Self::Invalidity> {
+///         // ...custom implementation...
+/// #        ValidationContext::new()
+/// #            .invalidate_if(
+/// #                self.0.len() < 3,
+/// #                EmailInvalidity::MinLength,
+/// #            )
+/// #            .invalidate_if(
+/// #                self.0.chars().filter(|c| *c == '@').count() != 1,
+/// #                EmailInvalidity::Format,
+/// #            )
+/// #            .into()
+///     }
+/// }
+///
+/// impl ValidatedFrom<UnvalidatedEmail> for Email {
+///     fn validated_from(from: UnvalidatedEmail) -> ValidatedResult<Self> {
+///         // 1st step: Convert value
+///         let from = Email(from.0);
+///         // 2nd step: Validate converted value
+///         if let Err(err) = from.validate() {
+///             Err((from, err))
+///         } else {
+///             Ok(from)
+///         }
+///     }
+/// }
+///
+/// let unvalidated_email = UnvalidatedEmail("test@example.com".to_string());
+/// match Email::validated_from(unvalidated_email) {
+///     Ok(email) => println!("Valid e-mail address: {}", email.0),
+///     Err((email, context)) => println!("Invalid e-mail address: {} {:?}", email.0, context),
+/// }
+/// ```
 pub trait ValidatedFrom<T>: Validate + Sized {
     /// Convert input value into `Self` and validate `self`
     fn validated_from(from: T) -> ValidatedResult<Self>;
