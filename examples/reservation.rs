@@ -84,8 +84,8 @@ impl Validate for ContactData {
 
     fn validate(&self) -> ValidationResult<Self::Invalidity> {
         ValidationContext::new()
-            .validate_and_map(&self.email, ContactDataInvalidity::Email)
-            .validate_and_map(&self.phone, ContactDataInvalidity::Phone)
+            .validate_from(&self.email, ContactDataInvalidity::Email)
+            .validate_from(&self.phone, ContactDataInvalidity::Phone)
             .invalidate_if(
                 // Either email or phone must be present
                 self.email.is_none() && self.phone.is_none(),
@@ -108,7 +108,7 @@ enum CustomerInvalidity {
 }
 
 // This conversion allows to use ValidationContext::validate()
-// instead of ValidationContext::validate_and_map().
+// instead of ValidationContext::validate_from().
 impl From<ContactDataInvalidity> for CustomerInvalidity {
     fn from(from: ContactDataInvalidity) -> Self {
         CustomerInvalidity::ContactData(from)
@@ -171,8 +171,8 @@ impl Validate for Reservation {
 
     fn validate(&self) -> ValidationResult<Self::Invalidity> {
         ValidationContext::new()
-            .validate_and_map(&self.customer, ReservationInvalidity::Customer)
-            .validate_and_map(&self.quantity, ReservationInvalidity::Quantity)
+            .validate_from(&self.customer, ReservationInvalidity::Customer)
+            .validate_from(&self.quantity, ReservationInvalidity::Quantity)
             .into()
     }
 }
