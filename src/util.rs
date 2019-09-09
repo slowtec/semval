@@ -59,7 +59,8 @@ pub(crate) trait Mergeable {
 pub(crate) trait MergeableSized: Mergeable + Sized {
     fn merge_exact_size_iter<I>(self, iter: I) -> Self
     where
-        I: ExactSizeIterator<Item = Self::Item> {
+        I: ExactSizeIterator<Item = Self::Item>,
+    {
         self.merge_iter(iter.len(), iter)
     }
 }

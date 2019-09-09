@@ -59,11 +59,7 @@ where
     }
 }
 
-impl<V> MergeableSized for Context<V>
-where
-    V: Invalidity,
-{
-}
+impl<V> MergeableSized for Context<V> where V: Invalidity {}
 
 impl<V> Context<V>
 where
