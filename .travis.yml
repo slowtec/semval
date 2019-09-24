@@ -45,7 +45,8 @@ before_script:
 script:
   - |
       cargo build &&
-      cargo test
+      cargo test &&
+      cargo doc --document-private-items
 
 after_success:
   - cargo coveralls
