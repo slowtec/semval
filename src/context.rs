@@ -85,8 +85,8 @@ where
 
     /// Conditionally record a new invalidity within this context
     #[inline]
-    pub fn invalidate_if(self, is_violated: bool, invalidity: impl Into<V>) -> Self {
-        if is_violated {
+    pub fn invalidate_if(self, is_invalid: impl Into<bool>, invalidity: impl Into<V>) -> Self {
+        if is_invalid.into() {
             self.invalidate(invalidity)
         } else {
             self
