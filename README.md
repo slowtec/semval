@@ -210,8 +210,8 @@ impl Validate for ContactData {
 
     fn validate(&self) -> ValidationResult<Self::Invalidity> {
         ValidationContext::new()
-            .validate_and_map(&self.email, ContactDataInvalidity::EmailAddress)
-            .validate_and_map(&self.phone, ContactDataInvalidity::PhoneNumber)
+            .validate_with(&self.email, ContactDataInvalidity::EmailAddress)
+            .validate_with(&self.phone, ContactDataInvalidity::PhoneNumber)
             .invalidate_if(
                 // Either email or phone must be present
                 self.email.is_none() && self.phone.is_none(),

@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Renamed functions with a *map* parameter:
+    - `validate_and_map()` becomes `validate_with()`
+    -  `map_and_merge_result()` becomes `merge_result_with()`
+
 ### Removed
 
 ## [0.1.1] - 2019-09-09

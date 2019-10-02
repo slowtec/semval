@@ -108,7 +108,7 @@ where
     /// Merge the mapped results of another validation
     ///
     /// Needed for collecting results from custom validation functions.
-    pub fn merge_result_from<F, U>(self, res: Result<U>, map: F) -> Self
+    pub fn merge_result_with<F, U>(self, res: Result<U>, map: F) -> Self
     where
         F: Fn(U) -> V,
         U: Invalidity,
@@ -123,7 +123,7 @@ where
     /// Merge the mapped results of another validation
     #[deprecated(
         since = "0.2.0",
-        note = "Please use [`merge_result_from`](#method.merge_result_from) instead"
+        note = "Please use [`merge_result_with`](#method.merge_result_with) instead"
     )]
     pub fn map_and_merge_result<F, U>(self, res: Result<U>, map: F) -> Self
     where
@@ -143,30 +143,30 @@ where
     where
         U: Invalidity + Into<V>,
     {
-        self.validate_from(target, Into::into)
+        self.validate_with(target, Into::into)
     }
 
     /// Validate the target and merge the mapped result into this context
     #[inline]
-    pub fn validate_from<F, U>(self, target: &impl Validate<Invalidity = U>, map: F) -> Self
+    pub fn validate_with<F, U>(self, target: &impl Validate<Invalidity = U>, map: F) -> Self
     where
         F: Fn(U) -> V,
         U: Invalidity,
     {
-        self.merge_result_from(target.validate(), map)
+        self.merge_result_with(target.validate(), map)
     }
 
     /// Validate the target, map the result, and merge it into this context
     #[deprecated(
         since = "0.2.0",
-        note = "Please use [`validate_from`](#method.validate_from) instead"
+        note = "Please use [`validate_with`](#method.validate_with) instead"
     )]
     pub fn validate_and_map<F, U>(self, target: &impl Validate<Invalidity = U>, map: F) -> Self
     where
         F: Fn(U) -> V,
         U: Invalidity,
     {
-        self.validate_from(target, map)
+        self.validate_with(target, map)
     }
 
     /// Finish the current validation of this context with a result
