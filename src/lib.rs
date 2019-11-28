@@ -20,7 +20,7 @@ pub mod context;
 /// A proposed set of imports to ease usage of this crate.
 pub mod prelude {
     pub use super::{
-        context::Context as ValidationContext, IntoValidated, Invalidity,
+        context::Context as ValidationContext, IntoValidated, Invalidity, IsValid,
         Result as ValidationResult, Validate, ValidatedFrom, ValidatedResult,
     };
 }
@@ -71,6 +71,22 @@ pub trait Validate {
 
     /// Perform the validation
     fn validate(&self) -> Result<Self::Invalidity>;
+}
+
+/// A utility trait for boolean validity checks.
+pub trait IsValid {
+    /// Check if this instance is valid, discarding all further
+    /// information why if not.
+    fn is_valid(&self) -> bool;
+}
+
+impl<T> IsValid for T
+where
+    T: Validate,
+{
+    fn is_valid(&self) -> bool {
+        self.validate().is_ok()
+    }
 }
 
 /// Validate `Some` or otherwise implicitly evaluate to `Ok`
@@ -254,5 +270,11 @@ mod tests {
     fn into_validated() {
         assert!(IntoValidated::<AlwaysValid>::into_validated(AlwaysValid).is_ok());
         assert!(IntoValidated::<AlwaysInvalid>::into_validated(AlwaysInvalid).is_err());
+    }
+
+    #[test]
+    fn is_valid() {
+        assert!(AlwaysValid.is_valid());
+        assert!(!AlwaysInvalid.is_valid());
     }
 }

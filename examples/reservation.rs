@@ -209,28 +209,34 @@ fn main() {
         quantity: Quantity::new(0),
     };
     println!("{:?}: {:?}", reservation, reservation.validate());
+    debug_assert!(!reservation.is_valid());
 
     reservation.customer.contact_data.email = Some(EmailAddress("a@b@c".to_string()));
     println!("{:?}: {:?}", reservation, reservation.validate());
+    debug_assert!(!reservation.is_valid());
 
     reservation.customer.name = "Mr X".to_string();
     reservation.customer.contact_data.phone = Some(PhoneNumber("0 123".to_string()));
     reservation.customer.contact_data.email = None;
     reservation.quantity = Quantity(4);
     println!("{:?}: {:?}", reservation, reservation.validate());
+    debug_assert!(!reservation.is_valid());
 
     reservation.customer.contact_data.phone = None;
     reservation.customer.contact_data.email = Some(EmailAddress("a@b.c".to_string()));
     println!("{:?}: {:?}", reservation, reservation.validate());
+    debug_assert!(reservation.is_valid());
 
     // Type-safe conversion and validation of input data
     for quantity in &[Quantity::new(1), Quantity::new(0)] {
         let new_reservation = new_reservation_with_quantity(*quantity);
         match Reservation::validated_from(new_reservation) {
             Ok(valid_reservation) => {
+                debug_assert!(valid_reservation.is_valid());
                 println!("Received a valid reservation {:?}", valid_reservation);
             }
             Err((invalid_reservation, context)) => {
+                debug_assert!(!invalid_reservation.is_valid());
                 println!(
                     "Received an invalid reservation {:?}: {:?}",
                     invalid_reservation, context
