@@ -5,7 +5,7 @@
 [![Dependencies status](https://deps.rs/repo/github/slowtec/semval/status.svg)](https://deps.rs/repo/github/slowtec/semval)
 [![Build status](https://travis-ci.org/slowtec/semval.svg?branch=master)](https://travis-ci.org/slowtec/semval)
 [![Coverage status](https://coveralls.io/repos/github/slowtec/semval/badge.svg?branch=master)](https://coveralls.io/github/slowtec/semval?branch=master)
-[![Apache 2.0 licensed](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](./LICENSE-APACHE)
+[![Apache 2.0 licensed](https://img.shields.io/badge/license-MIT%2FApache--2.0-blue.svg)](./LICENSE-APACHE)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE-MIT)
 
 A lightweight and unopinionated library with minimal dependencies for semantic validation in Rust.
