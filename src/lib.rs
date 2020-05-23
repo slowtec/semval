@@ -89,6 +89,19 @@ where
     }
 }
 
+/// `Validate` is implemented for any reference of a type
+/// that implements `Validate`.
+impl<'a, V> Validate for &'a V
+where
+    V: Validate,
+{
+    type Invalidity = V::Invalidity;
+
+    fn validate(&self) -> Result<Self::Invalidity> {
+        (*self).validate()
+    }
+}
+
 /// Validate `Some` or otherwise implicitly evaluate to `Ok`
 /// in case of `None`
 ///
@@ -255,9 +268,21 @@ mod tests {
     }
 
     #[test]
+    fn validate_option_ref_none() {
+        assert!((None as Option<&AlwaysValid>).validate().is_ok());
+        assert!((None as Option<&AlwaysInvalid>).validate().is_ok());
+    }
+
+    #[test]
     fn validate_option_some() {
         assert!(Some(AlwaysValid).validate().is_ok());
         assert!(Some(AlwaysInvalid).validate().is_err());
+    }
+
+    #[test]
+    fn validate_option_ref_some() {
+        assert!(Some(&AlwaysValid).validate().is_ok());
+        assert!(Some(&AlwaysInvalid).validate().is_err());
     }
 
     #[test]
