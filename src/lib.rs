@@ -122,6 +122,20 @@ where
     }
 }
 
+/// Validate all elements of a slice
+impl<V> Validate for [V]
+where
+    V: Validate,
+{
+    type Invalidity = V::Invalidity;
+
+    fn validate(&self) -> Result<Self::Invalidity> {
+        self.iter()
+            .fold(Context::new(), |ctx, elem| ctx.validate(elem))
+            .into()
+    }
+}
+
 /// Result of a value-to-value conversion with post-validation of the output value
 pub type ValidatedResult<V> = CoreResult<V, (V, Context<<V as Validate>::Invalidity>)>;
 
@@ -255,6 +269,28 @@ mod tests {
         }
     }
 
+    struct Dummy {
+        is_valid: bool,
+    }
+
+    impl Dummy {
+        pub fn valid() -> Self {
+            Self { is_valid: true }
+        }
+
+        pub fn invalid() -> Self {
+            Self { is_valid: false }
+        }
+    }
+
+    impl Validate for Dummy {
+        type Invalidity = ();
+
+        fn validate(&self) -> Result<Self::Invalidity> {
+            Context::new().invalidate_if(!self.is_valid, ()).into()
+        }
+    }
+
     #[test]
     fn validate() {
         assert!(AlwaysValid.validate().is_ok());
@@ -283,6 +319,66 @@ mod tests {
     fn validate_option_ref_some() {
         assert!(Some(&AlwaysValid).validate().is_ok());
         assert!(Some(&AlwaysInvalid).validate().is_err());
+    }
+
+    #[test]
+    fn validate_slices() {
+        assert!(vec![Dummy::valid(), Dummy::valid()].validate().is_ok());
+        assert_eq!(
+            1,
+            vec![Dummy::valid(), Dummy::invalid()]
+                .validate()
+                .unwrap_err()
+                .into_iter()
+                .count()
+        );
+        assert_eq!(
+            1,
+            vec![Dummy::invalid(), Dummy::valid()]
+                .validate()
+                .unwrap_err()
+                .into_iter()
+                .count()
+        );
+        assert_eq!(
+            2,
+            vec![Dummy::invalid(), Dummy::invalid()]
+                .validate()
+                .unwrap_err()
+                .into_iter()
+                .count()
+        );
+    }
+
+    #[test]
+    fn validate_slices_ref() {
+        let valid = Dummy::valid();
+        let invalid = Dummy::invalid();
+        assert!(vec![&valid, &valid].validate().is_ok());
+        assert_eq!(
+            1,
+            vec![&valid, &invalid]
+                .validate()
+                .unwrap_err()
+                .into_iter()
+                .count()
+        );
+        assert_eq!(
+            1,
+            vec![&invalid, &valid]
+                .validate()
+                .unwrap_err()
+                .into_iter()
+                .count()
+        );
+        assert_eq!(
+            2,
+            vec![&invalid, &invalid]
+                .validate()
+                .unwrap_err()
+                .into_iter()
+                .count()
+        );
     }
 
     #[test]
