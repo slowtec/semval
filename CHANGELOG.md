@@ -13,11 +13,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-## [0.1.4] - 2020-05-23
+
+## [0.1.5] - 2020-05-23
 
 ### Added
 
 - Added implicit implementation of the Validate trait for reference types
+
+## [0.1.4] - 2020-05-23
+
+***Unreleased***
 
 ## [0.1.3] - 2019-11-28
 
