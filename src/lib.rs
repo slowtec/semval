@@ -1,6 +1,6 @@
 #![deny(missing_docs)]
 #![deny(missing_debug_implementations)]
-#![deny(intra_doc_link_resolution_failure)]
+#![deny(broken_intra_doc_links)]
 #![cfg_attr(test, deny(warnings))]
 #![cfg_attr(not(feature = "std"), no_std)]
 
