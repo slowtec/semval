@@ -136,6 +136,18 @@ where
     }
 }
 
+#[cfg(feature = "std")]
+impl<V> Validate for Vec<V>
+where
+    V: Validate,
+{
+    type Invalidity = V::Invalidity;
+
+    fn validate(&self) -> Result<Self::Invalidity> {
+        self.as_slice().validate()
+    }
+}
+
 /// Result of a value-to-value conversion with post-validation of the output value
 pub type ValidatedResult<V> = CoreResult<V, (V, Context<<V as Validate>::Invalidity>)>;
 
@@ -326,7 +338,7 @@ mod tests {
         assert!(vec![Dummy::valid(), Dummy::valid()].validate().is_ok());
         assert_eq!(
             1,
-            vec![Dummy::valid(), Dummy::invalid()]
+            (&vec![Dummy::valid(), Dummy::invalid()].as_slice())
                 .validate()
                 .unwrap_err()
                 .into_iter()
@@ -334,7 +346,7 @@ mod tests {
         );
         assert_eq!(
             1,
-            vec![Dummy::invalid(), Dummy::valid()]
+            [Dummy::invalid(), Dummy::valid()]
                 .validate()
                 .unwrap_err()
                 .into_iter()
@@ -342,12 +354,20 @@ mod tests {
         );
         assert_eq!(
             2,
-            vec![Dummy::invalid(), Dummy::invalid()]
+            (&[Dummy::invalid(), Dummy::invalid()])
                 .validate()
                 .unwrap_err()
                 .into_iter()
                 .count()
         );
+    }
+
+    #[test]
+    #[cfg(feature = "std")]
+    fn validate_borrowed_vec() {
+        let vec = vec![Dummy::valid(), Dummy::valid()];
+        let borrowed_vec = &vec;
+        assert!(borrowed_vec.validate().is_ok());
     }
 
     #[test]

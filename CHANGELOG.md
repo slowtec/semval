@@ -13,23 +13,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
+## [0.1.7] - 2021-01-12
+
+### Added
+
+- Added implicit implementation of `Validate` for `Vec<T>` if feature `std` is enabled
+
 ## [0.1.6] - 2020-05-25
 
 ### Added
 
-- Added implicit implementation of the Validate trait for slices
+- Added implicit implementation of `Validate` for slices
 
 ## [0.1.5] - 2020-05-23
 
 ### Added
 
-- Added implicit implementation of the Validate trait for reference types
+- Added implicit implementation of `Validate` trait reference types
 
-## [0.1.4] - 2020-05-23
+## 0.1.4 - 2020-05-23
 
 ***Unreleased***
 
-## [0.1.3] - 2019-11-28
+## 0.1.3 - 2019-11-28
 
 ### Added
 
@@ -43,7 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `validate_and_map()` becomes `validate_with()`
   - `map_and_merge_result()` becomes `merge_result_with()`
 
-## [0.1.1] - 2019-09-09
+## 0.1.1 - 2019-09-09
 
 ### Added
 
@@ -53,15 +59,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Generalized `validate()` for all `Invalidity` types that implement `Into`
 
-## [0.1.0] - 2019-09-03
+## 0.1.0 - 2019-09-03
 
 ### Added
 
 - Initial public release
 
-[Unreleased]: https://github.com/slowtec/semval/compare/v0.1.4...master
-[0.1.4]: https://github.com/slowtec/semval/releases/v0.1.3
-[0.1.3]: https://github.com/slowtec/semval/releases/v0.1.3
-[0.1.2]: https://github.com/slowtec/semval/releases/v0.1.2
-[0.1.1]: https://github.com/slowtec/semval/releases/v0.1.1
-[0.1.0]: https://github.com/slowtec/semval/releases/v0.1.0
+[Unreleased]: https://github.com/slowtec/semval/compare/v0.1.7...master
+[0.1.7]: https://github.com/slowtec/semval/releases/v0.1.7
+[0.1.6]: https://github.com/slowtec/semval/releases/v0.1.6
+[0.1.5]: https://github.com/slowtec/semval/releases/v0.1.5
