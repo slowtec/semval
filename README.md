@@ -2,9 +2,9 @@
 
 [![Crates.io](https://img.shields.io/crates/v/semval.svg)](https://crates.io/crates/semval)
 [![Docs.rs](https://docs.rs/semval/badge.svg)](https://docs.rs/semval)
-[![Dependencies status](https://deps.rs/repo/github/slowtec/semval/status.svg)](https://deps.rs/repo/github/slowtec/semval)
-[![Build status](https://travis-ci.org/slowtec/semval.svg?branch=master)](https://travis-ci.org/slowtec/semval)
-[![Coverage status](https://coveralls.io/repos/github/slowtec/semval/badge.svg?branch=master)](https://coveralls.io/github/slowtec/semval?branch=master)
+[![Deps.rs](https://deps.rs/repo/github/slowtec/semval/status.svg)](https://deps.rs/repo/github/slowtec/semval)
+[![Security audit](https://github.com/slowtec/semval/actions/workflows/security-audit.yaml/badge.svg)](https://github.com/slowtec/semval/actions/workflows/security-audit.yaml)
+[![Continuous integration](https://github.com/slowtec/semval/actions/workflows/continuous-integration.yaml/badge.svg)](https://github.com/slowtec/semval/actions/workflows/continuous-integration.yaml)
 [![Apache 2.0 licensed](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](./LICENSE-APACHE)
 [![MIT licensed](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE-MIT)
 
