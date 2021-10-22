@@ -65,7 +65,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Initial public release
 
-[Unreleased]: https://github.com/slowtec/semval/compare/v0.1.7...master
+[Unreleased]: https://github.com/slowtec/semval/compare/v0.1.7...main
 [0.1.7]: https://github.com/slowtec/semval/releases/v0.1.7
 [0.1.6]: https://github.com/slowtec/semval/releases/v0.1.6
 [0.1.5]: https://github.com/slowtec/semval/releases/v0.1.5

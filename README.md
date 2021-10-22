@@ -1,7 +1,7 @@
 # semval
 
 [![Crates.io](https://img.shields.io/crates/v/semval.svg)](https://crates.io/crates/semval)
-[![Docs.rs](https://docs.rs/semval/badge.svg)](https://docs.rs/semval/)
+[![Docs.rs](https://docs.rs/semval/badge.svg)](https://docs.rs/semval)
 [![Dependencies status](https://deps.rs/repo/github/slowtec/semval/status.svg)](https://deps.rs/repo/github/slowtec/semval)
 [![Build status](https://travis-ci.org/slowtec/semval.svg?branch=master)](https://travis-ci.org/slowtec/semval)
 [![Coverage status](https://coveralls.io/repos/github/slowtec/semval/badge.svg?branch=master)](https://coveralls.io/github/slowtec/semval?branch=master)
@@ -87,7 +87,7 @@ us to validate domain entities according to our business requirements.
 
 We will solely focus on the *contact data* entity for simplicity. This is sufficient to
 deduce the basic principles. The complete code can be found in the file
-[reservation.rs](https://github.com/slowtec/semval/blob/master/examples/reservation.rs)
+[reservation.rs](https://github.com/slowtec/semval/blob/main/examples/reservation.rs)
 that is provided as an example in the repository.
 
 ### Invalidity
