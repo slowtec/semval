@@ -145,9 +145,10 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::unit_cmp)]
     fn unit_mergeable() {
+        assert!(() == ().merge(()));
         assert_eq!((), <() as Mergeable>::empty(5));
-        assert_eq!((), ().merge(()));
         assert_eq!((), ().merge_iter(3, core::iter::repeat(()).take(3)));
     }
 

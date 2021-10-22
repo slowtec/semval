@@ -180,12 +180,12 @@ where
     }
 }
 
-impl<V> Into<Result<V>> for Context<V>
+impl<V> From<Context<V>> for Result<V>
 where
     V: Invalidity,
 {
-    fn into(self) -> Result<V> {
-        self.into_result()
+    fn from(from: Context<V>) -> Self {
+        from.into_result()
     }
 }
 

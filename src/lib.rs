@@ -338,7 +338,7 @@ mod tests {
         assert!(vec![Dummy::valid(), Dummy::valid()].validate().is_ok());
         assert_eq!(
             1,
-            (&vec![Dummy::valid(), Dummy::invalid()].as_slice())
+            (vec![Dummy::valid(), Dummy::invalid()].as_slice())
                 .validate()
                 .unwrap_err()
                 .into_iter()
