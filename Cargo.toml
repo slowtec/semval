@@ -8,7 +8,7 @@ readme = "README.md"
 authors = ["slowtec GmbH <post@slowtec.de>", "Uwe Klotz <uwe.klotz@gmail.com>"]
 repository = "https://github.com/slowtec/semval"
 categories = ["no-std", "rust-patterns"]
-edition = "2018"
+edition = "2021"
 
 [dependencies]
 smallvec = "1"
