@@ -15,8 +15,6 @@ repos:
   - id: fix-byte-order-marker
   - id: forbid-new-submodules
   - id: mixed-line-ending
-  - id: no-commit-to-branch
-    args: [--branch, main ]
   - id: trailing-whitespace
 - repo: https://github.com/DavidAnson/markdownlint-cli2
   rev: v0.3.2
