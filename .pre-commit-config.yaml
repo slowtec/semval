@@ -22,20 +22,38 @@ repos:
   - id: markdownlint-cli2
     exclude: ^LICENSE\.md$
 - repo: https://github.com/shellcheck-py/shellcheck-py
-  rev: v0.7.2.1
+  rev: v0.8.0.1
   hooks:
   - id: shellcheck
 - repo: https://github.com/codespell-project/codespell
   rev: v2.1.0
   hooks:
   - id: codespell
-    args: [--ignore-words=.codespellignore]
+    args: [
+      --ignore-words=.codespellignore,
+    ]
 - repo: https://github.com/doublify/pre-commit-rust
   rev: v1.0
   hooks:
   - id: fmt
-    args: [--all, --]
+    args: [
+      --all,
+      --,
+    ]
   - id: cargo-check
-    args: [--workspace, --all-features, --]
+    args: [
+      --locked,
+      --workspace,
+      --all-features,
+      --all-targets,
+    ]
   - id: clippy
-    args: [--all-targets, --all-features, --, -D, warnings]
+    args: [
+      --locked,
+      --workspace,
+      --all-features,
+      --all-targets,
+      --,
+      -D,
+      warnings,
+    ]
