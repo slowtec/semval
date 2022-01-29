@@ -67,24 +67,28 @@ where
 {
     /// Create a new valid and empty context
     #[inline]
+    #[must_use]
     pub fn new() -> Self {
         Self::empty(<SmallVecArray<V> as smallvec::Array>::size())
     }
 
     /// Check if the context is still valid
     #[inline]
+    #[must_use]
     pub fn is_valid(&self) -> bool {
         self.is_empty()
     }
 
     /// Record a new invalidity within this context
     #[inline]
+    #[must_use]
     pub fn invalidate(self, invalidity: impl Into<V>) -> Self {
         self.merge_iter(1, once(invalidity.into()))
     }
 
     /// Conditionally record a new invalidity within this context
     #[inline]
+    #[must_use]
     pub fn invalidate_if(self, is_invalid: impl Into<bool>, invalidity: impl Into<V>) -> Self {
         if is_invalid.into() {
             self.invalidate(invalidity)
@@ -97,6 +101,7 @@ where
     ///
     /// Needed for collecting results from custom validation functions.
     #[inline]
+    #[must_use]
     pub fn merge_result(self, res: Result<V>) -> Self {
         if let Err(other) = res {
             self.merge(other)
@@ -108,6 +113,7 @@ where
     /// Merge the mapped results of another validation
     ///
     /// Needed for collecting results from custom validation functions.
+    #[must_use]
     pub fn merge_result_with<F, U>(self, res: Result<U>, map: F) -> Self
     where
         F: Fn(U) -> V,
@@ -125,6 +131,7 @@ where
         since = "0.2.0",
         note = "Please use [`merge_result_with`](#method.merge_result_with) instead"
     )]
+    #[must_use]
     pub fn map_and_merge_result<F, U>(self, res: Result<U>, map: F) -> Self
     where
         F: Fn(U) -> V,
@@ -139,6 +146,7 @@ where
 
     /// Validate the target and merge the result into this context
     #[inline]
+    #[must_use]
     pub fn validate<U>(self, target: &impl Validate<Invalidity = U>) -> Self
     where
         U: Invalidity + Into<V>,
@@ -148,6 +156,7 @@ where
 
     /// Validate the target and merge the mapped result into this context
     #[inline]
+    #[must_use]
     pub fn validate_with<F, U>(self, target: &impl Validate<Invalidity = U>, map: F) -> Self
     where
         F: Fn(U) -> V,
@@ -161,6 +170,7 @@ where
         since = "0.2.0",
         note = "Please use [`validate_with`](#method.validate_with) instead"
     )]
+    #[must_use]
     pub fn validate_and_map<F, U>(self, target: &impl Validate<Invalidity = U>, map: F) -> Self
     where
         F: Fn(U) -> V,
