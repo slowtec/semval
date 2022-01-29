@@ -33,6 +33,12 @@ jobs:
         with:
           command: generate-lockfile
 
+      - name: Build tests with default features disabled
+        uses: actions-rs/cargo@v1
+        with:
+          command: test
+          args: --workspace --locked --no-default-features --no-run
+
       - name: Build tests with all features enabled
         uses: actions-rs/cargo@v1
         with:

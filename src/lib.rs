@@ -346,10 +346,10 @@ mod tests {
 
     #[test]
     fn validate_slices() {
-        assert!(vec![Dummy::valid(), Dummy::valid()].validate().is_ok());
+        assert!([Dummy::valid(), Dummy::valid()].validate().is_ok());
         assert_eq!(
             1,
-            (vec![Dummy::valid(), Dummy::invalid()].as_slice())
+            ([Dummy::valid(), Dummy::invalid()].as_slice())
                 .validate()
                 .unwrap_err()
                 .into_iter()
@@ -385,10 +385,10 @@ mod tests {
     fn validate_slices_ref() {
         let valid = Dummy::valid();
         let invalid = Dummy::invalid();
-        assert!(vec![&valid, &valid].validate().is_ok());
+        assert!([&valid, &valid].validate().is_ok());
         assert_eq!(
             1,
-            vec![&valid, &invalid]
+            [&valid, &invalid]
                 .validate()
                 .unwrap_err()
                 .into_iter()
@@ -396,7 +396,7 @@ mod tests {
         );
         assert_eq!(
             1,
-            vec![&invalid, &valid]
+            [&invalid, &valid]
                 .validate()
                 .unwrap_err()
                 .into_iter()
@@ -404,7 +404,7 @@ mod tests {
         );
         assert_eq!(
             2,
-            vec![&invalid, &invalid]
+            [&invalid, &invalid]
                 .validate()
                 .unwrap_err()
                 .into_iter()
