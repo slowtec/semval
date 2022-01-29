@@ -259,7 +259,7 @@ solutions, and are not restricted by this library in any way.
 
 ## License
 
-Copyright (c) 2019 [Uwe Klotz](https://github.com/uklotzde), [slowtec GmbH](https://github.com/slowtec)
+Copyright (c) 2019-2022 [Uwe Klotz](https://github.com/uklotzde), [slowtec GmbH](https://github.com/slowtec)
 
 Licensed under either of
 
