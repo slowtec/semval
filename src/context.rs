@@ -126,24 +126,6 @@ where
         }
     }
 
-    /// Merge the mapped results of another validation
-    #[deprecated(
-        since = "0.2.0",
-        note = "Please use [`merge_result_with`](#method.merge_result_with) instead"
-    )]
-    #[must_use]
-    pub fn map_and_merge_result<F, U>(self, res: Result<U>, map: F) -> Self
-    where
-        F: Fn(U) -> V,
-        U: Invalidity,
-    {
-        if let Err(other) = res {
-            self.merge_exact_size_iter(other.invalidities.into_iter().map(map))
-        } else {
-            self
-        }
-    }
-
     /// Validate the target and merge the result into this context
     #[inline]
     #[must_use]
@@ -163,20 +145,6 @@ where
         U: Invalidity,
     {
         self.merge_result_with(target.validate(), map)
-    }
-
-    /// Validate the target, map the result, and merge it into this context
-    #[deprecated(
-        since = "0.2.0",
-        note = "Please use [`validate_with`](#method.validate_with) instead"
-    )]
-    #[must_use]
-    pub fn validate_and_map<F, U>(self, target: &impl Validate<Invalidity = U>, map: F) -> Self
-    where
-        F: Fn(U) -> V,
-        U: Invalidity,
-    {
-        self.validate_with(target, map)
     }
 
     /// Finish the current validation of this context with a result
