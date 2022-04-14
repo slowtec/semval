@@ -1,21 +1,22 @@
-/// Trait implementations for smallvec types
-use crate::util::*;
+//! Trait implementations and re-exports for smallvec
 
 /// Re-exports
-pub(crate) use smallvec::{Array, IntoIter, SmallVec};
+pub(crate) use smallvec::{Array, SmallVec};
 
-impl<A> IsEmpty for smallvec::SmallVec<A>
+use crate::util::{IsEmpty, Mergeable};
+
+impl<A> IsEmpty for SmallVec<A>
 where
-    A: smallvec::Array,
+    A: Array,
 {
     fn is_empty(&self) -> bool {
         self.is_empty()
     }
 }
 
-impl<A> Mergeable for smallvec::SmallVec<A>
+impl<A> Mergeable for SmallVec<A>
 where
-    A: smallvec::Array,
+    A: Array,
 {
     type Item = A::Item;
 

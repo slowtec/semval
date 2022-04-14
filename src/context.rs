@@ -1,8 +1,10 @@
-use super::*;
-
-use crate::smallvec::*;
-
 use core::iter::once;
+
+use crate::{
+    smallvec::SmallVec,
+    util::{IsEmpty, Mergeable, MergeableSized},
+    Invalidity, Validate, ValidationResult,
+};
 
 const SMALLVEC_ARRAY_LEN: usize = 8;
 
@@ -102,7 +104,7 @@ where
     /// Needed for collecting results from custom validation functions.
     #[inline]
     #[must_use]
-    pub fn merge_result(self, res: Result<V>) -> Self {
+    pub fn merge_result(self, res: ValidationResult<V>) -> Self {
         if let Err(other) = res {
             self.merge(other)
         } else {
@@ -114,7 +116,7 @@ where
     ///
     /// Needed for collecting results from custom validation functions.
     #[must_use]
-    pub fn merge_result_with<F, U>(self, res: Result<U>, map: F) -> Self
+    pub fn merge_result_with<F, U>(self, res: ValidationResult<U>, map: F) -> Self
     where
         F: Fn(U) -> V,
         U: Invalidity,
@@ -149,7 +151,7 @@ where
 
     /// Finish the current validation of this context with a result
     #[inline]
-    pub fn into_result(self) -> Result<V> {
+    pub fn into_result(self) -> ValidationResult<V> {
         if self.is_valid() {
             Ok(())
         } else {
@@ -158,7 +160,7 @@ where
     }
 }
 
-impl<V> From<Context<V>> for Result<V>
+impl<V> From<Context<V>> for ValidationResult<V>
 where
     V: Invalidity,
 {

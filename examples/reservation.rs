@@ -177,21 +177,8 @@ impl Validate for Reservation {
     }
 }
 
-struct NewReservation(Reservation);
-
-impl ValidatedFrom<NewReservation> for Reservation {
-    fn validated_from(from: NewReservation) -> ValidatedResult<Reservation> {
-        let into = from.0;
-        if let Err(context) = into.validate() {
-            Err((into, context))
-        } else {
-            Ok(into)
-        }
-    }
-}
-
-fn new_reservation_with_quantity(quantity: Quantity) -> NewReservation {
-    NewReservation(Reservation {
+fn new_reservation_with_quantity(quantity: Quantity) -> Reservation {
+    Reservation {
         customer: Customer {
             name: "Mr X".to_string(),
             contact_data: ContactData {
@@ -200,7 +187,11 @@ fn new_reservation_with_quantity(quantity: Quantity) -> NewReservation {
             },
         },
         quantity,
-    })
+    }
+}
+
+fn process_reservation(reservation: &Validated<Reservation>) {
+    println!("Processing reservation: {:?}", &reservation);
 }
 
 fn main() {
@@ -231,15 +222,15 @@ fn main() {
     for quantity in &[Quantity::new(1), Quantity::new(0)] {
         let new_reservation = new_reservation_with_quantity(*quantity);
         match Reservation::validated_from(new_reservation) {
-            Ok(valid_reservation) => {
-                debug_assert!(valid_reservation.is_valid());
-                println!("Received a valid reservation {:?}", valid_reservation);
+            Ok(reservation) => {
+                debug_assert!(reservation.is_valid());
+                process_reservation(&reservation);
             }
-            Err((invalid_reservation, context)) => {
-                debug_assert!(!invalid_reservation.is_valid());
+            Err((reservation, context)) => {
+                debug_assert!(!reservation.is_valid());
                 println!(
                     "Received an invalid reservation {:?}: {:?}",
-                    invalid_reservation, context
+                    reservation, context
                 );
             }
         }

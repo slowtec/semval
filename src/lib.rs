@@ -23,25 +23,26 @@
 //!
 //! Without any macro magic, at least not now.
 
+use core::{any::Any, fmt::Debug, ops::Deref};
+
 /// Invalidity context
 pub mod context;
+use self::context::Context;
+
+mod smallvec;
+
+mod util;
+use self::util::UnitResult;
 
 /// The crate's prelude
 ///
 /// A proposed set of imports to ease usage of this crate.
 pub mod prelude {
     pub use super::{
-        context::Context as ValidationContext, IntoValidated, Invalidity, IsValid,
-        Result as ValidationResult, Validate, ValidatedFrom, ValidatedResult,
+        context::Context as ValidationContext, IntoValidated, Invalidity, IsValid, Validate,
+        Validated, ValidatedFrom, ValidatedResult, ValidationResult,
     };
 }
-
-mod smallvec;
-mod util;
-
-use self::{context::Context, util::*};
-
-use core::{any::Any, fmt::Debug, result::Result as CoreResult};
 
 /// Result of a validation
 ///
@@ -51,7 +52,7 @@ use core::{any::Any, fmt::Debug, result::Result as CoreResult};
 ///
 /// In contrast to common results the actual payload is carried by
 /// the error variant while a successful result is just the unit type.
-pub type Result<V> = UnitResult<Context<V>>;
+pub type ValidationResult<V> = UnitResult<Context<V>>;
 
 /// Invalidities that cause validation failures
 ///
@@ -81,7 +82,7 @@ pub trait Validate {
     type Invalidity: Invalidity;
 
     /// Perform the validation
-    fn validate(&self) -> Result<Self::Invalidity>;
+    fn validate(&self) -> ValidationResult<Self::Invalidity>;
 }
 
 /// A utility trait for boolean validity checks.
@@ -108,7 +109,7 @@ where
 {
     type Invalidity = V::Invalidity;
 
-    fn validate(&self) -> Result<Self::Invalidity> {
+    fn validate(&self) -> ValidationResult<Self::Invalidity> {
         (*self).validate()
     }
 }
@@ -124,7 +125,7 @@ where
 {
     type Invalidity = V::Invalidity;
 
-    fn validate(&self) -> Result<Self::Invalidity> {
+    fn validate(&self) -> ValidationResult<Self::Invalidity> {
         if let Some(ref some) = self {
             some.validate()
         } else {
@@ -140,7 +141,7 @@ where
 {
     type Invalidity = V::Invalidity;
 
-    fn validate(&self) -> Result<Self::Invalidity> {
+    fn validate(&self) -> ValidationResult<Self::Invalidity> {
         self.iter()
             .fold(Context::new(), |ctx, elem| ctx.validate(elem))
             .into()
@@ -154,13 +155,33 @@ where
 {
     type Invalidity = V::Invalidity;
 
-    fn validate(&self) -> Result<Self::Invalidity> {
+    fn validate(&self) -> ValidationResult<Self::Invalidity> {
         self.as_slice().validate()
     }
 }
 
+/// Tags a type as _validated_
+#[derive(Debug, Clone, Copy)]
+pub struct Validated<T>(T);
+
+impl<T> Validated<T> {
+    /// Extract the validated value
+    pub fn into(self) -> T {
+        self.0
+    }
+}
+
+impl<T> Deref for Validated<T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        &self.0
+    }
+}
+
 /// Result of a value-to-value conversion with post-validation of the output value
-pub type ValidatedResult<V> = CoreResult<V, (V, Context<<V as Validate>::Invalidity>)>;
+pub type ValidatedResult<T> =
+    core::result::Result<Validated<T>, (T, Context<<T as Validate>::Invalidity>)>;
 
 /// Value-to-value conversion with post-validation of the output value
 ///
@@ -183,8 +204,6 @@ pub type ValidatedResult<V> = CoreResult<V, (V, Context<<V as Validate>::Invalid
 /// # Example
 /// ```
 /// # use semval::prelude::*;
-///
-/// struct UnvalidatedEmail(String);
 ///
 /// struct Email(String);
 ///
@@ -212,21 +231,8 @@ pub type ValidatedResult<V> = CoreResult<V, (V, Context<<V as Validate>::Invalid
 ///     }
 /// }
 ///
-/// impl ValidatedFrom<UnvalidatedEmail> for Email {
-///     fn validated_from(from: UnvalidatedEmail) -> ValidatedResult<Self> {
-///         // 1st step: Convert value
-///         let from = Email(from.0);
-///         // 2nd step: Validate converted value
-///         if let Err(err) = from.validate() {
-///             Err((from, err))
-///         } else {
-///             Ok(from)
-///         }
-///     }
-/// }
-///
-/// let unvalidated_email = UnvalidatedEmail("test@example.com".to_string());
-/// match Email::validated_from(unvalidated_email) {
+/// let email = Email("test@example.com".to_string());
+/// match Email::validated_from(email) {
 ///     Ok(email) => println!("Valid e-mail address: {}", email.0),
 ///     Err((email, context)) => println!("Invalid e-mail address: {} {:?}", email.0, context),
 /// }
@@ -244,7 +250,7 @@ where
         if let Err(err) = from.validate() {
             Err((from, err))
         } else {
-            Ok(from)
+            Ok(Validated(from))
         }
     }
 }
@@ -277,7 +283,7 @@ mod tests {
     impl Validate for AlwaysValid {
         type Invalidity = ();
 
-        fn validate(&self) -> Result<Self::Invalidity> {
+        fn validate(&self) -> ValidationResult<Self::Invalidity> {
             Context::new().into()
         }
     }
@@ -287,7 +293,7 @@ mod tests {
     impl Validate for AlwaysInvalid {
         type Invalidity = ();
 
-        fn validate(&self) -> Result<Self::Invalidity> {
+        fn validate(&self) -> ValidationResult<Self::Invalidity> {
             Context::new().invalidate(()).into()
         }
     }
@@ -309,7 +315,7 @@ mod tests {
     impl Validate for Dummy {
         type Invalidity = ();
 
-        fn validate(&self) -> Result<Self::Invalidity> {
+        fn validate(&self) -> ValidationResult<Self::Invalidity> {
             Context::new().invalidate_if(!self.is_valid, ()).into()
         }
     }
