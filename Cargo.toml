@@ -11,7 +11,7 @@ categories = ["no-std", "rust-patterns"]
 edition = "2021"
 
 [dependencies]
-smallvec = ">=1.7"
+smallvec = { version = "1.8.0", features = [] }
 
 [features]
 default = ["std"]
