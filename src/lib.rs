@@ -1,18 +1,16 @@
+// rustflags
+#![warn(rust_2018_idioms)]
+#![warn(rust_2021_compatibility)]
+#![warn(missing_debug_implementations)]
+#![warn(unreachable_pub)]
 #![warn(unsafe_code)]
-#![cfg_attr(not(debug_assertions), deny(warnings))]
-#![deny(rust_2018_idioms)]
-#![deny(rust_2021_compatibility)]
-#![deny(missing_debug_implementations)]
-#![deny(missing_docs)]
-#![deny(rustdoc::broken_intra_doc_links)]
-#![deny(clippy::all)]
-#![deny(clippy::explicit_deref_methods)]
-#![deny(clippy::explicit_into_iter_loop)]
-#![deny(clippy::explicit_iter_loop)]
-#![deny(clippy::must_use_candidate)]
-#![cfg_attr(test, deny(warnings))]
-#![cfg_attr(not(test), deny(clippy::panic_in_result_fn))]
-#![cfg_attr(not(debug_assertions), deny(clippy::used_underscore_binding))]
+#![warn(clippy::pedantic)]
+// Repeating the type name in `..Default::default()` expressions
+// is not needed since the context is obvious.
+#![allow(clippy::default_trait_access)]
+// rustdocflags
+#![warn(rustdoc::broken_intra_doc_links)]
+// nostd
 #![cfg_attr(not(feature = "std"), no_std)]
 
 //! # semval
@@ -82,6 +80,11 @@ pub trait Validate {
     type Invalidity: Invalidity;
 
     /// Perform the validation
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err` with the collected invalidities if one or more
+    /// validations failed.
     fn validate(&self) -> ValidationResult<Self::Invalidity>;
 }
 
@@ -142,9 +145,7 @@ where
     type Invalidity = V::Invalidity;
 
     fn validate(&self) -> ValidationResult<Self::Invalidity> {
-        self.iter()
-            .fold(Context::new(), |ctx, elem| ctx.validate(elem))
-            .into()
+        self.iter().fold(Context::new(), Context::validate).into()
     }
 }
 
@@ -239,6 +240,11 @@ pub type ValidatedResult<T> =
 /// ```
 pub trait ValidatedFrom<T>: Validate + Sized {
     /// Convert input value into `Self` and validate `self`
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err` with the collected invalidities if one or more
+    /// validations failed.
     fn validated_from(from: T) -> ValidatedResult<Self>;
 }
 
@@ -257,11 +263,16 @@ where
 
 /// Value-to-value conversion with post-validation of the output value
 ///
-/// Prefer to implement [ValidatedFrom](trait.ValidatedFrom.html) for types inside
-/// the current crate. All types that implement [ValidatedFrom](trait.ValidatedFrom.html)
+/// Prefer to implement [`ValidatedFrom`] for types inside
+/// the current crate. All types that implement [`ValidatedFrom`]
 /// implicitly implement this trait.
 pub trait IntoValidated<V: Validate> {
     /// Convert `self` into output value and validate the output
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err` with the collected invalidities if one or more
+    /// validations failed.
     fn into_validated(self) -> ValidatedResult<V>;
 }
 
@@ -303,11 +314,11 @@ mod tests {
     }
 
     impl Dummy {
-        pub fn valid() -> Self {
+        fn valid() -> Self {
             Self { is_valid: true }
         }
 
-        pub fn invalid() -> Self {
+        fn invalid() -> Self {
             Self { is_valid: false }
         }
     }

@@ -149,7 +149,14 @@ where
         self.merge_result_with(target.validate(), map)
     }
 
-    /// Finish the current validation of this context with a result
+    /// Finish the validation
+    ///
+    /// Finishes the current validation of this context with a result.
+    ///
+    /// # Errors
+    ///
+    /// Returns `Err` with the collected invalidities if one or more
+    /// validations failed.
     #[inline]
     pub fn into_result(self) -> ValidationResult<V> {
         if self.is_valid() {

@@ -1,7 +1,7 @@
 //! Utilities for internal usage
 
 ///////////////////////////////////////////////////////////////////////////////
-/// IsEmpty
+// IsEmpty
 ///////////////////////////////////////////////////////////////////////////////
 
 // TODO: Reuse from https://github.com/Stebalien/tool-rs?
@@ -97,7 +97,7 @@ impl Mergeable for usize {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-/// UnitResult
+// UnitResult
 ///////////////////////////////////////////////////////////////////////////////
 
 /// A result with only an error and the unit type `()` on success
@@ -116,8 +116,7 @@ where
     fn merge(self, other: Self) -> Self {
         match (self, other) {
             (Ok(()), Ok(())) => Ok(()),
-            (Ok(()), Err(err)) => Err(err),
-            (Err(err), Ok(())) => Err(err),
+            (Ok(()), Err(err)) | (Err(err), Ok(())) => Err(err),
             (Err(e1), Err(e2)) => Err(e1.merge(e2)),
         }
     }
@@ -141,7 +140,7 @@ mod tests {
 
     #[test]
     fn unit_is_empty() {
-        assert!(().is_empty())
+        assert!(().is_empty());
     }
 
     #[test]
