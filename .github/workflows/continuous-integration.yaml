@@ -1,4 +1,9 @@
-name: Continuous integration
+# SPDX-FileCopyrightText: slowtec GmbH
+# SPDX-License-Identifier: CC0-1.0
+
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow
+
+name: continuous-integration
 
 on:
   pull_request:

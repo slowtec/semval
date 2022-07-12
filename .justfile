@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: slowtec GmbH
+# SPDX-License-Identifier: CC0-1.0
+
 # just manual: https://github.com/casey/just/#readme
 
 _default:
@@ -5,13 +8,19 @@ _default:
 
 # Set up (and update) tooling
 setup:
-    rustup self update
-    cargo install \
-        cargo-edit \
-        trunk
+    # Ignore rustup failures, because not everyone might use it
+    rustup self update || true
+    # cargo-edit is needed for `cargo upgrade`
+    cargo install cargo-edit
     pip install -U pre-commit
     pre-commit autoupdate
-    #pre-commit install --hook-type commit-msg --hook-type pre-commit
+    pre-commit install --hook-type commit-msg --hook-type pre-commit
+
+# Upgrade (and update) dependencies
+upgrade:
+    RUST_BACKTRACE=1 cargo upgrade --workspace
+    cargo update
+    #cargo minimal-versions check --workspace
 
 # Format source code
 fmt:
@@ -20,11 +29,6 @@ fmt:
 # Run pre-commit hooks
 pre-commit:
     pre-commit run --all-files
-
-# Upgrade (and update) depenencies
-upgrade:
-    cargo upgrade --workspace
-    cargo update
 
 # Run build checks
 check:

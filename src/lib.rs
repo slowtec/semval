@@ -1,4 +1,6 @@
-// rustflags
+// SPDX-FileCopyrightText: slowtec GmbH
+// SPDX-License-Identifier: MPL-2.0
+
 #![warn(rust_2018_idioms)]
 #![warn(rust_2021_compatibility)]
 #![warn(missing_debug_implementations)]
@@ -8,9 +10,7 @@
 // Repeating the type name in `..Default::default()` expressions
 // is not needed since the context is obvious.
 #![allow(clippy::default_trait_access)]
-// rustdocflags
 #![warn(rustdoc::broken_intra_doc_links)]
-// nostd
 #![cfg_attr(not(feature = "std"), no_std)]
 
 //! # semval

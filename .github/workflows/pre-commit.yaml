@@ -1,3 +1,8 @@
+# SPDX-FileCopyrightText: slowtec GmbH
+# SPDX-License-Identifier: CC0-1.0
+
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow
+
 name: pre-commit
 
 on:
@@ -33,14 +38,16 @@ jobs:
           command: generate-lockfile
 
       - name: Setup Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
 
       - name: Detect code style issues (push)
-        uses: pre-commit/action@v2.0.3
+        uses: pre-commit/action@v3.0.0
         if: github.event_name == 'push'
 
       - name: Detect code style issues (pull_request)
-        uses: pre-commit/action@v2.0.3
+        uses: pre-commit/action@v3.0.0
         if: github.event_name == 'pull_request'
         env:
           SKIP: no-commit-to-branch

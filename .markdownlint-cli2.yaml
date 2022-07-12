@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: slowtec GmbH
+# SPDX-License-Identifier: CC0-1.0
+
 # Disable some built-in rules
 config:
   default: true

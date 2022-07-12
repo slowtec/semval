@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: slowtec GmbH
+// SPDX-License-Identifier: MPL-2.0
+
 //! Trait implementations and re-exports for smallvec
 
 /// Re-exports

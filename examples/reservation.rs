@@ -1,3 +1,6 @@
+// SPDX-FileCopyrightText: slowtec GmbH
+// SPDX-License-Identifier: MPL-2.0
+
 use semval::prelude::*;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
