@@ -18,7 +18,8 @@ setup:
 
 # Upgrade (and update) dependencies
 upgrade:
-    RUST_BACKTRACE=1 cargo upgrade --workspace
+    cargo update
+    cargo upgrade --workspace
     cargo update
     #cargo minimal-versions check --workspace
 
