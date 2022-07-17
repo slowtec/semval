@@ -1,0 +1,33 @@
+{
+  "rules": {
+    "subject-min-length": [
+      2,
+      "always",
+      8
+    ],
+    "subject-max-length": [
+      2,
+      "always",
+      50
+    ],
+    "subject-case": [
+      2,
+      "always",
+      "sentence-case"
+    ],
+    "subject-full-stop": [
+      2,
+      "never",
+      "."
+    ],
+    "body-max-line-length": [
+      2,
+      "always",
+      72
+    ],
+    "footer-leading-blank": [
+      2,
+      "always"
+    ]
+  }
+}
