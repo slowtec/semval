@@ -18,6 +18,7 @@ setup:
 
 # Upgrade (and update) dependencies
 upgrade:
+    cargo upgrade
     cargo update
     cargo upgrade --to-lockfile
 
