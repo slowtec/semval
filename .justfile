@@ -11,7 +11,7 @@ setup:
     # Ignore rustup failures, because not everyone might use it
     rustup self update || true
     # cargo-edit is needed for `cargo upgrade`
-    cargo install cargo-edit
+    cargo install just cargo-edit
     pip install -U pre-commit
     pre-commit autoupdate
     pre-commit install --hook-type commit-msg --hook-type pre-commit
