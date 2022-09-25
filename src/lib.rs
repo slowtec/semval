@@ -382,7 +382,7 @@ mod tests {
         );
         assert_eq!(
             2,
-            (&[Dummy::invalid(), Dummy::invalid()])
+            ([Dummy::invalid(), Dummy::invalid()])
                 .validate()
                 .unwrap_err()
                 .into_iter()

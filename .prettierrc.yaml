@@ -1,0 +1,10 @@
+# SPDX-FileCopyrightText: slowtec GmbH
+# SPDX-License-Identifier: CC0-1.0
+
+overrides:
+  - files:
+      - "**/*.yaml"
+    options:
+      tabWidth: 2
+      # in double quotes you can use escapes
+      singleQuote: false

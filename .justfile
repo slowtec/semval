@@ -20,7 +20,6 @@ upgrade: setup
     pre-commit autoupdate
     cargo upgrade
     cargo update
-    cargo upgrade --to-lockfile
 
 # Format source code
 fmt:
