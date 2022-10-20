@@ -164,7 +164,7 @@ where
 #[cfg(feature = "std")]
 impl<'a, V> Validate for std::borrow::Cow<'a, V>
 where
-    V: Validate + ToOwned + 'a,
+    V: Validate + ToOwned + 'a + ?Sized,
 {
     type Invalidity = V::Invalidity;
 
