@@ -161,6 +161,18 @@ where
     }
 }
 
+#[cfg(feature = "std")]
+impl<'a, V> Validate for std::borrow::Cow<'a, V>
+where
+    V: Validate + Clone,
+{
+    type Invalidity = V::Invalidity;
+
+    fn validate(&self) -> ValidationResult<Self::Invalidity> {
+        self.as_ref().validate()
+    }
+}
+
 /// Tags a type as _validated_
 #[derive(Debug, Clone, Copy)]
 pub struct Validated<T>(T);
