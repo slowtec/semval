@@ -5,7 +5,7 @@
 name = "semval"
 description = "Semantic validation"
 keywords = ["semantic", "validation"]
-version = "0.4.0"
+version = "0.4.1"
 license = "MPL-2.0"
 readme = "README.md"
 authors = ["slowtec GmbH <post@slowtec.de>", "Uwe Klotz <uwe.klotz@gmail.com>"]
@@ -14,7 +14,7 @@ categories = ["no-std", "rust-patterns"]
 edition = "2021"
 
 [dependencies]
-smallvec = { version = "1.9.0", features = ["union"] }
+smallvec = { version = "1.10.0", features = ["union"] }
 
 [features]
 default = ["std"]
