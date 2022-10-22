@@ -184,11 +184,18 @@ impl<T> Validated<T> {
     }
 }
 
+impl<T> AsRef<T> for Validated<T> {
+    fn as_ref(&self) -> &T {
+        let Self(inner) = self;
+        inner
+    }
+}
+
 impl<T> Deref for Validated<T> {
     type Target = T;
 
     fn deref(&self) -> &Self::Target {
-        &self.0
+        self.as_ref()
     }
 }
 
