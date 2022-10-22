@@ -97,7 +97,7 @@ pub trait IsValid {
 
 impl<T> IsValid for T
 where
-    T: Validate,
+    T: Validate + ?Sized,
 {
     fn is_valid(&self) -> bool {
         self.validate().is_ok()
@@ -108,7 +108,7 @@ where
 /// that implements `Validate`.
 impl<'a, V> Validate for &'a V
 where
-    V: Validate,
+    V: Validate + ?Sized,
 {
     type Invalidity = V::Invalidity;
 
