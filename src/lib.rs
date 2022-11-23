@@ -182,12 +182,17 @@ impl<T> Validated<T> {
     pub fn into(self) -> T {
         self.0
     }
+
+    /// Converts from `&Validated<T>` to `Validated<&T>`.
+    #[inline]
+    pub const fn as_ref(&self) -> Validated<&T> {
+        Validated(&self.0)
+    }
 }
 
 impl<T> AsRef<T> for Validated<T> {
     fn as_ref(&self) -> &T {
-        let Self(inner) = self;
-        inner
+        self
     }
 }
 
@@ -195,7 +200,7 @@ impl<T> Deref for Validated<T> {
     type Target = T;
 
     fn deref(&self) -> &Self::Target {
-        self.as_ref()
+        &self.0
     }
 }
 
