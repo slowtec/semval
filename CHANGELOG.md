@@ -8,6 +8,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0] - 2022-11-24
+
+- Add `as_ref()` to `Validated`
+
+### BREAKING CHANGES
+
+- As `Validated` now has an inherent `as_ref()` method, code that
+  used to call `AsRef::as_ref` on it may now behave differently.
+  `AsRef` impl is still available and can be called explicitly,
+  or simply use `Deref` instead.
+
 ## [0.4.1] - 2022-10-21
 
 - Add support for `std::borrow::Cow`
@@ -54,7 +65,7 @@ No (notable) API changes.
 
 ## 0.1.4 - 2020-05-23
 
-***Unreleased***
+**_Unreleased_**
 
 ## 0.1.3 - 2019-11-28
 
@@ -66,7 +77,7 @@ No (notable) API changes.
 
 ### Changed
 
-- Renamed functions with a *map* parameter:
+- Renamed functions with a _map_ parameter:
   - `validate_and_map()` becomes `validate_with()`
   - `map_and_merge_result()` becomes `merge_result_with()`
 
