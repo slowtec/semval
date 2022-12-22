@@ -20,11 +20,9 @@ jobs:
       # TODO: Remove manual installation of toolchain after
       # https://github.com/actions-rs/audit-check/issues/215
       # has been resolved.
-      - uses: actions-rs/toolchain@v1
+      - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: stable
-          profile: minimal
-          override: true
 
       - uses: actions/checkout@v3
 

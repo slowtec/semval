@@ -25,11 +25,9 @@ jobs:
           python-version: "3.x"
 
       - name: Install Rust toolchain
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@master
         with:
           toolchain: stable
-          profile: minimal
-          components: rustfmt, clippy
 
       - name: Check out repository
         uses: actions/checkout@v3
