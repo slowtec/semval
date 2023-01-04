@@ -29,40 +29,26 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v3
 
+      - name: Generate Cargo.lock
+        run: cargo generate-lockfile
+
       - name: Cache Rust toolchain and build artifacts
         uses: Swatinem/rust-cache@v2
-
-      - name: Generate Cargo.lock
-        uses: actions-rs/cargo@v1
         with:
-          command: generate-lockfile
+          # Distinguished by the action name to avoid sharing across different actions!
+          shared-key: "continuous-integration"
 
       - name: Build tests with default features disabled
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --workspace --locked --no-default-features --no-run
+        run: cargo test --workspace --locked --no-default-features --no-run
 
       - name: Build tests with all features enabled
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --workspace --locked --all-features --no-run
+        run: cargo test --workspace --locked --all-features --no-run
 
       - name: Run tests with all features enabled
-        uses: actions-rs/cargo@v1
-        with:
-          command: test
-          args: --workspace --locked --all-features -- --nocapture --quiet
+        run: cargo test --workspace --locked --all-features -- --nocapture --quiet
 
       - name: Build workspace documentation with all features enabled
-        uses: actions-rs/cargo@v1
-        with:
-          command: doc
-          args: --workspace --locked --all-features
+        run: cargo doc --workspace --locked --all-features
 
       - name: Build release with default features
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --locked --profile release
+        run: cargo build --locked --profile release
