@@ -28,9 +28,9 @@ avoid inconsistencies and even more to prevent physical damage.
 
 ### Use case
 
-Assume you are creating a web service for managing *reservations* in a restaurant.
+Assume you are creating a web service for managing _reservations_ in a restaurant.
 Customers can place reservations for a certain start time and a number of guests.
-As *contact data* they need to leave their *phone number* or *e-mail address*,
+As _contact data_ they need to leave their _phone number_ or _e-mail address_,
 at least one of both.
 
 The JSON request body for creating a new reservation may look like in this example:
@@ -45,7 +45,7 @@ The JSON request body for creating a new reservation may look like in this examp
       "phone": "+49 711 500 716 72",
       "email": "post@slowtec.de"
     }
-  },
+  }
 }
 ```
 
@@ -69,8 +69,8 @@ In this example, both phone number and e-mail address are still represented by s
 but wrapped into
 [tuple structs](https://doc.rust-lang.org/1.9.0/book/structs.html#tuple-structs)
 with a single member. This commonly used
-[*newtype* pattern](https://doc.rust-lang.org/book/ch19-04-advanced-types.html?highlight=newtype#using-the-newtype-pattern-for-type-safety-and-abstraction)
-establishes type safety at compile time and enables us to add *behavior* to these
+[_newtype_ pattern](https://doc.rust-lang.org/book/ch19-04-advanced-types.html?highlight=newtype#using-the-newtype-pattern-for-type-safety-and-abstraction)
+establishes type safety at compile time and enables us to add _behavior_ to these
 types.
 
 ### Business Rules
@@ -84,10 +84,10 @@ of the following conditions are satisfied:
 
 ## Validation
 
-Let's develop a software design for the *reservation* example use case. It should empower
+Let's develop a software design for the _reservation_ example use case. It should empower
 us to validate domain entities according to our business requirements.
 
-We will solely focus on the *contact data* entity for simplicity. This is sufficient to
+We will solely focus on the _contact data_ entity for simplicity. This is sufficient to
 deduce the basic principles. The complete code can be found in the file
 [reservation.rs](https://github.com/slowtec/semval/blob/main/examples/reservation.rs)
 that is provided as an example in the repository.
@@ -96,12 +96,12 @@ that is provided as an example in the repository.
 
 What are the possible outcomes of a validation? If the validation succeeds we are done
 and processing continues as if nothing happened, i.e. validation is typically an
-[*idempotent*](https://en.wikipedia.org/wiki/Idempotence)
+[_idempotent_](https://en.wikipedia.org/wiki/Idempotence)
 operation. If the validation fails we somehow want to understand why it failed to
 resolve conflicts or to fix inconsistencies. Finally, we may need to report any
 unresolved findings back to the caller.
 
-Reasons for a failed validation are expressed in terms of *invalidity*. An invalidity
+Reasons for a failed validation are expressed in terms of _invalidity_. An invalidity
 is basically the inverse of some validation condition.
 
 The invalidity variants for contact data are:
@@ -115,7 +115,7 @@ and phone number might be invalid for the same entity.
 
 ### Results
 
-We already realized that the successful result of a validation is essentially *nothing*.
+We already realized that the successful result of a validation is essentially _nothing_.
 In Rust this nothing is represented by the unit type `()`.
 
 Any invalidity will cause the validation to fail. Does this mean we should fail early and
@@ -135,18 +135,18 @@ We will refine it in a moment.
 ### Context
 
 Validation is a recursive operation that needs to traverse deeply nested data structures.
-The current state during such a traversal defines a *context* for the validation with
-a certain *level of abstraction*.
+The current state during such a traversal defines a _context_ for the validation with
+a certain _level of abstraction_.
 
 At the `ContactData` level we need to recursively validate both phone number and e-mail
 address if present. Those subordinate validations are performed on a lower level of
 abstraction, unaware of the upper-level context.
 
 Additionally, we check if both members are missing and then reject the `ContactData` as
-*incomplete*. This is the only validation that is actually implemented on the current
+_incomplete_. This is the only validation that is actually implemented on the current
 level without recursion.
 
-Let's encode all possible variants in Rust by using *sum types*:
+Let's encode all possible variants in Rust by using _sum types_:
 
 ```rust
 enum PhoneNumberInvalidity {
@@ -230,7 +230,7 @@ as executing own validations rules. Finally, it transforms the context into a
 result for passing it back to the caller.
 
 The
-[*fluent interface*](https://martinfowler.com/bliki/FluentInterface.html)
+[_fluent interface_](https://martinfowler.com/bliki/FluentInterface.html)
 has proven to be useful and readable for the majority of use cases, even if more
 complex validations may require to break the control flow at certain points.
 
@@ -244,7 +244,7 @@ trace back the cause of failed validations.
 
 The validation code is independent of infrastructure components and an ideal
 candidate for including it in the
-[*functional core*](https://www.destroyallsoftware.com/screencasts/catalog/functional-core-imperative-shell)
+[_functional core_](https://www.destroyallsoftware.com/screencasts/catalog/functional-core-imperative-shell)
 of a system. With simple unit tests we can verify that the validation
 works as expected and reliably protects us from accepting invalid data.
 
@@ -253,7 +253,7 @@ works as expected and reliably protects us from accepting invalid data.
 We didn't cover
 
 - how to enhance `Invalidity` types with additional, context-sensitive data
-by defining them as *tagged variants* and
+  by defining them as _tagged variants_ and
 - how to route and interpret validation results.
 
 The answers to both questions depend on each other, require use case-specific
