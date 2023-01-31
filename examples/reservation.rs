@@ -231,10 +231,7 @@ fn main() {
             }
             Err((reservation, context)) => {
                 debug_assert!(!reservation.is_valid());
-                println!(
-                    "Received an invalid reservation {:?}: {:?}",
-                    reservation, context
-                );
+                println!("Received an invalid reservation {reservation:?}: {context:?}");
             }
         }
     }
