@@ -39,12 +39,12 @@ repos:
     hooks:
       - id: shellcheck
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.2.2
+    rev: v2.2.4
     hooks:
       - id: codespell
         args: [--ignore-words=.codespellignore]
   - repo: https://github.com/pre-commit/mirrors-prettier
-    rev: v3.0.0-alpha.4
+    rev: v3.0.0-alpha.6
     hooks:
       - id: prettier
         types_or:
@@ -52,7 +52,7 @@ repos:
           - yaml
   # https://reuse.software
   - repo: https://github.com/fsfe/reuse-tool
-    rev: v1.1.0
+    rev: v1.1.2
     hooks:
       - id: reuse
   - repo: https://github.com/doublify/pre-commit-rust
