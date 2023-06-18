@@ -22,9 +22,7 @@ jobs:
 
     steps:
       - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: stable
+        uses: dtolnay/rust-toolchain@stable
 
       - name: Check out repository
         uses: actions/checkout@v3

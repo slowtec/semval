@@ -20,9 +20,7 @@ jobs:
       # TODO: Remove manual installation of toolchain after
       # https://github.com/actions-rs/audit-check/issues/215
       # has been resolved.
-      - uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: stable
+      - uses: dtolnay/rust-toolchain@stable
 
       - name: Install cargo-audit
         run: cargo install cargo-audit
