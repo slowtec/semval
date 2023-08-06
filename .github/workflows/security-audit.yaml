@@ -13,9 +13,13 @@ on:
   #  - cron: '0 0 * * *'
   workflow_dispatch:
 
+env:
+  CARGO_TERM_COLOR: always
+
 jobs:
-  security-audit:
+  run:
     runs-on: ubuntu-latest
+
     steps:
       # TODO: Remove manual installation of toolchain after
       # https://github.com/actions-rs/audit-check/issues/215
@@ -31,7 +35,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
         with:
           # Distinguished by the action name to avoid sharing across different actions!
-          shared-key: "security-audit"
+          shared-key: ${{ github.workflow }}-${{ github.job }}
 
       - name: Run security audit
         run: cargo audit --deny unsound --deny yanked
