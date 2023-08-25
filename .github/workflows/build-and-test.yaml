@@ -40,9 +40,6 @@ jobs:
       - name: Build tests with default features disabled
         run: cargo test --workspace --locked --no-default-features --no-run
 
-      - name: Build tests with all features enabled
-        run: cargo test --workspace --locked --all-features --no-run
-
       - name: Run tests with all features enabled
         run: cargo test --workspace --locked --all-features -- --nocapture --quiet
 

@@ -44,7 +44,7 @@ where
             (other, self)
         };
         this.reserve(that.len());
-        this.insert_many(this.len(), that.into_iter());
+        this.insert_many(this.len(), that);
         this
     }
 

@@ -6,11 +6,15 @@
 #![warn(missing_debug_implementations)]
 #![warn(unreachable_pub)]
 #![warn(unsafe_code)]
+#![warn(rustdoc::broken_intra_doc_links)]
 #![warn(clippy::pedantic)]
+// Additional restrictions
+#![warn(clippy::clone_on_ref_ptr)]
+#![warn(clippy::missing_const_for_fn)]
+#![warn(clippy::self_named_module_files)]
 // Repeating the type name in `..Default::default()` expressions
 // is not needed since the context is obvious.
 #![allow(clippy::default_trait_access)]
-#![warn(rustdoc::broken_intra_doc_links)]
 #![cfg_attr(not(feature = "std"), no_std)]
 
 //! # semval
@@ -338,11 +342,11 @@ mod tests {
     }
 
     impl Dummy {
-        fn valid() -> Self {
+        const fn valid() -> Self {
             Self { is_valid: true }
         }
 
-        fn invalid() -> Self {
+        const fn invalid() -> Self {
             Self { is_valid: false }
         }
     }
