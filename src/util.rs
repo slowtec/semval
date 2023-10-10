@@ -74,7 +74,7 @@ impl Mergeable for () {
 
     fn empty<H>(_: H) -> Self {}
 
-    fn merge(self, _: Self) -> Self {}
+    fn merge(self, (): Self) -> Self {}
 
     fn merge_iter<I, H>(self, _: I, _: H) -> Self {}
 }
