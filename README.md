@@ -7,7 +7,7 @@
 [![Docs.rs](https://docs.rs/semval/badge.svg)](https://docs.rs/semval)
 [![Deps.rs](https://deps.rs/repo/github/slowtec/semval/status.svg)](https://deps.rs/repo/github/slowtec/semval)
 [![Security audit](https://github.com/slowtec/semval/actions/workflows/security-audit.yaml/badge.svg)](https://github.com/slowtec/semval/actions/workflows/security-audit.yaml)
-[![Continuous integration](https://github.com/slowtec/semval/actions/workflows/continuous-integration.yaml/badge.svg)](https://github.com/slowtec/semval/actions/workflows/continuous-integration.yaml)
+[![Continuous integration](https://github.com/slowtec/semval/actions/workflows/build-and-test.yaml/badge.svg)](https://github.com/slowtec/semval/actions/workflows/build-and-test.yaml)
 [![License: MPL 2.0](https://img.shields.io/badge/License-MPL_2.0-brightgreen.svg)](https://opensource.org/licenses/MPL-2.0)
 
 A lightweight and unopinionated library with minimal dependencies for semantic validation in Rust.

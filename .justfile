@@ -18,7 +18,7 @@ setup:
 # Upgrade (and update) dependencies
 upgrade: setup
     pre-commit autoupdate
-    cargo upgrade --incompatible
+    cargo upgrade --incompatible --pinned
     cargo update
 
 # Format source code
