@@ -19,3 +19,31 @@ smallvec = { version = "1.13.1", features = ["union"] }
 [features]
 default = ["std"]
 std = []
+
+[lints.rust]
+future_incompatible = "warn"
+let_underscore = "warn"
+missing_debug_implementations = "warn"
+rust_2018_idioms = "warn"
+rust_2021_compatibility = "warn"
+unreachable_pub = "warn"
+unsafe_code = "warn"
+unused = "warn"
+
+[lints.clippy]
+pedantic = "warn"
+clone_on_ref_ptr = "warn"
+missing_const_for_fn = "warn"
+self_named_module_files = "warn"
+
+# Repetitions of module/type names occur frequently when using many
+# modules for keeping the size of the source files handy. Often
+# types have the same name as their parent module.
+module_name_repetitions = "allow"
+
+# Repeating the type name in `Default::default()` expressions
+# is not needed as long as the context is obvious.
+default_trait_access = "allow"
+
+# The error types returned should be self-explanatory.
+missing_errors_doc = "allow"

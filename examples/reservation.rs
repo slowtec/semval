@@ -46,7 +46,7 @@ impl PhoneNumber {
 }
 
 impl PhoneNumber {
-    pub fn len(&self) -> usize {
+    fn len(&self) -> usize {
         self.0.chars().filter(|c| !c.is_whitespace()).count()
     }
 }
@@ -137,7 +137,7 @@ impl Quantity {
         Self(1)
     }
 
-    fn new(value: usize) -> Self {
+    const fn new(value: usize) -> Self {
         Self(value)
     }
 }

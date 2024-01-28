@@ -1,26 +1,6 @@
 // SPDX-FileCopyrightText: slowtec GmbH
 // SPDX-License-Identifier: MPL-2.0
 
-// Opt-in for allowed-by-default lints (in alphabetical order)
-// See also: <https://doc.rust-lang.org/rustc/lints>
-#![warn(future_incompatible)]
-#![warn(let_underscore)]
-#![warn(missing_debug_implementations)]
-#![warn(rust_2018_idioms)]
-#![warn(rust_2021_compatibility)]
-#![warn(unreachable_pub)]
-#![warn(unsafe_code)]
-#![warn(unused)]
-// Clippy lints
-#![warn(clippy::pedantic)]
-// Additional restrictions
-#![warn(clippy::clone_on_ref_ptr)]
-#![warn(clippy::missing_const_for_fn)]
-#![warn(clippy::mod_module_files)]
-// Repeating the type name in `..Default::default()` expressions
-// is not needed since the context is obvious.
-#![allow(clippy::default_trait_access)]
-// Opt-out of feature "std"
 #![cfg_attr(not(feature = "std"), no_std)]
 
 //! # semval
