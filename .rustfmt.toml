@@ -7,19 +7,19 @@
 edition = "2021"
 
 # <https://github.com/rust-lang/rustfmt/blob/master/Configurations.md#imports_granularity>
-imports_granularity = "Crate"
+#imports_granularity = "Crate"
 
 # <https://github.com/rust-lang/rustfmt/blob/master/Configurations.md#group_imports>
-group_imports = "StdExternalCrate"
+#group_imports = "StdExternalCrate"
 
 # <https://github.com/rust-lang/rustfmt/blob/master/Configurations.md#use_field_init_shorthand>
-use_field_init_shorthand = true
+#use_field_init_shorthand = true
 
 # <https://github.com/rust-lang/rustfmt/blob/master/Configurations.md#use_try_shorthand>
-use_try_shorthand = true
+#use_try_shorthand = true
 
 # <https://github.com/rust-lang/rustfmt/blob/master/Configurations.md#format_strings>
-format_strings = true
+#format_strings = true
 
 # <https://github.com/rust-lang/rustfmt/blob/master/Configurations.md#format_code_in_doc_comments>
-format_code_in_doc_comments = true
+#format_code_in_doc_comments = true
