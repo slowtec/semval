@@ -37,6 +37,9 @@ clone_on_ref_ptr = "warn"
 missing_const_for_fn = "warn"
 self_named_module_files = "warn"
 
+# Workaround for <https://github.com/rust-lang/rust-clippy/issues/12270>
+lint_groups_priority = "allow"
+
 # Repetitions of module/type names occur frequently when using many
 # modules for keeping the size of the source files handy. Often
 # types have the same name as their parent module.
