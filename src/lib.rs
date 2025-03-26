@@ -27,8 +27,8 @@ use self::util::UnitResult;
 /// A proposed set of imports to ease usage of this crate.
 pub mod prelude {
     pub use super::{
-        context::Context as ValidationContext, IntoValidated, Invalidity, IsValid, Validate,
-        Validated, ValidatedFrom, ValidatedResult, ValidationResult,
+        IntoValidated, Invalidity, IsValid, Validate, Validated, ValidatedFrom, ValidatedResult,
+        ValidationResult, context::Context as ValidationContext,
     };
 }
 
@@ -96,7 +96,7 @@ where
 
 /// `Validate` is implemented for any reference of a type
 /// that implements `Validate`.
-impl<'a, V> Validate for &'a V
+impl<V> Validate for &V
 where
     V: Validate + ?Sized,
 {
@@ -119,7 +119,7 @@ where
     type Invalidity = V::Invalidity;
 
     fn validate(&self) -> ValidationResult<Self::Invalidity> {
-        if let Some(ref some) = self {
+        if let Some(some) = self {
             some.validate()
         } else {
             Ok(())

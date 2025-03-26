@@ -26,10 +26,15 @@ jobs:
       # has been resolved.
       - uses: dtolnay/rust-toolchain@stable
 
+      - name: Install cargo-binstall
+        uses: cargo-bins/cargo-binstall@main
+
       - name: Install cargo-audit
-        run: cargo install cargo-audit
+        run: cargo binstall cargo-audit
 
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Cache Rust toolchain and build artifacts
         uses: Swatinem/rust-cache@v2
