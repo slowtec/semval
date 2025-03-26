@@ -4,9 +4,9 @@
 use core::iter::once;
 
 use crate::{
+    Invalidity, Validate, ValidationResult,
     smallvec::SmallVec,
     util::{IsEmpty, Mergeable, MergeableSized},
-    Invalidity, Validate, ValidationResult,
 };
 
 const SMALLVEC_ARRAY_LEN: usize = 8;
@@ -162,11 +162,7 @@ where
     /// validations failed.
     #[inline]
     pub fn into_result(self) -> ValidationResult<V> {
-        if self.is_valid() {
-            Ok(())
-        } else {
-            Err(self)
-        }
+        if self.is_valid() { Ok(()) } else { Err(self) }
     }
 }
 
