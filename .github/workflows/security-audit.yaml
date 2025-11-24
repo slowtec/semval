@@ -32,7 +32,7 @@ jobs:
       - name: Install cargo-audit
         run: cargo binstall cargo-audit
 
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
         with:
           persist-credentials: false
 
