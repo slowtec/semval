@@ -151,7 +151,7 @@ mod tests {
     fn unit_mergeable() {
         assert!(() == ().merge(()));
         assert_eq!((), <() as Mergeable>::empty(5));
-        assert_eq!((), ().merge_iter(3, core::iter::repeat(()).take(3)));
+        assert_eq!((), ().merge_iter(3, core::iter::repeat_n((), 3)));
     }
 
     #[test]
